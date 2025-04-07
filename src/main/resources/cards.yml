@@ -1,0 +1,23 @@
+#
+# Bingo Games plugin by MarkManFlame_55
+# Developed for EspectralGames
+#
+
+# To add items to the cards, use its respective MATERIAL variant. Check list here:
+# https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html
+
+bingo:
+  cards:
+    # Add here all the new cards
+    bingocard_preseted: # Use this structure to have a card with fixed positions of the items
+      row1: []
+      row2: []
+      row3: []
+      row4: []
+      row5: []
+    bingocard_randomized: # Use this structure to add as many items as you want,the plugin will automaticly place then in random orden in the card.
+      pool: []
+    # You can add mor cards if you want!
+
+    # my_own_card:
+    #  pool: [ACACIA_BOAT,BEDROCK,OAK_BOAT,SPRUCE_BOAT,BIRCH_BOAT,DARK_OAK_BOAT,JUNGLE_BOAT,MANGROVE_BOAT,CHERRY_BOAT,PALE_OAK_BOAT,APPLE,GOLDEN_APPLE,ENCHANTED_GOLDEN_APPLE,CARROT,GOLDEN_CARROT,IRON_INGOT,GOLD_INGOT,COPPER_INGOT,NETHERITE_INGOT,DIAMOND,EMERALD,RESIN_BRICK,DIAMOND_BLOCK,NETHERITE_BLOCK,END_PORTAL_FRAME]

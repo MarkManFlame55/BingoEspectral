@@ -1,0 +1,11 @@
+#
+# Bingo Games plugin by MarkManFlame_55
+# Developed for EspectralGames
+#
+
+# The maximun distance the players can go away while waiting to start
+spawn-max-distance: 32
+# The name of the team that is asigned to the spectators of the game
+spectator-team-name: "bingo_spectator"
+# This stores the last seed played, if the game starts and no card has been generated, this seed will be used instead
+last-bingo-seed-played:

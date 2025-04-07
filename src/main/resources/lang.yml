@@ -1,0 +1,103 @@
+#
+# Bingo Games plugin by MarkManFlame_55
+# Developed for EspectralGames
+#
+
+# This plugin uses MiniMessage API for the messages.
+# Check https://webui.advntr.dev/ to format the messages appropriately.
+
+bingo:
+  # The prefix that's going to be used when sending messages to a player
+  prefix: "<b><dark_gray>[<gradient:gold:yellow>BingoEspectral<dark_gray>]<reset>"
+  ui:
+    # Inventory name for the bingo options display
+    options_title: "Bingo Options"
+    # Inventory name for the bingo card display
+    card_title: "Your Bingo Card!"
+    # Name of the /bingo options items
+    display_time: "<yellow>Show time on Action Bar:"
+    max_time: "<yellow>Max Time:"
+    time_limit: "<yellow>Time Limit:"
+    bingo_type: "<aqua>Bingo Type:"
+    pvp: "<gold>PvP:"
+    hardcore: "<red>Hardcore Mode:"
+    uhc: "<red>UHC Mode:"
+    keep_inventory: "<green>Keep Inventory:"
+    delete_items: "<dark_red>Delete items when marked:"
+    full_card: "<dark_green>Full Card:"
+    # Description for buttons that open other inventories
+    click_to_open: "<dark_gray>Click to open"
+  game:
+    # When a player founds an item of its card.
+    # (Variables: %player% - Player obtaining the item, %item% - The item obtained)
+    item_found: "%player% found %item%"
+    # Action bar message while waiting the game to start
+    waiting_to_start: "<gray>Waiting to start..."
+    # Title before the start countdown
+    starting_countdown: "Staring in..."
+    # Title when the game starts
+    game_starts: "<light_purple>Good Luck!"
+    # Message when the game is forced to stop with /bingo stop
+    game_stopped: "The game has been stopped!"
+    # Message when the card is generated with /bingo generate
+    card_generated: "The card has been successfully generated!"
+    # Message when a new spectator joins mid-game
+    game_already_started: "The games has already started, but you can stay spectating!"
+    # Action bar message displaying total game time
+    # (Variables: %h% - Hours played, %m% - Minutes in the hour, %s% - Seconds in the minute)
+    total_game_time: "<gold>Time Played: <aqua>%h%:%m%:%s%"
+    # Message displaying the amount of items the winner has found
+    # (Variables: %player% - Player that won the game, %count% - Number of items found by the player)
+    player_won_points: "<b><light_purple> %player%</b><white> won with %count% points!"
+    # When a player has died on hardcore mode
+    disqualified: "<red>You died and lost the game! :("
+    # End of game title.
+    # Variables: %player% - Player that won the game.
+    win:
+      title: "<light_purple>Game Ended!"
+      subtitle: "<gold><b>%player%</b><white> won!"
+    # Name and description of the Bingo Card item.
+    bingo_card_item:
+      item_name: "<light_purple>Bingo Card!"
+      description: "<gray>Right Click to see your Bingo Card!"
+  error:
+    # When a player tries to open the Bingo Card item, bute there´s no bingo card yet
+    cant_open_bingo_card: "You can´t open your Bingo Card if it´s not generated!"
+    # When the generation of the Bingo Card failed.
+    failed_card_generation: "Couldn´t generate new bingo card! It´s using a valid seed?"
+    # When a player tries to leave spawn area while waiting to start
+    u_cant_escape: "You cannot leave the area!"
+    # When a player tries to start the game without generating a Bingo Card
+    cant_start_without_card: "You can´t start the game without generating a Bingo Card!"
+    # When the player fails writing a command
+    bad_command_arguments: "Wrong Arguments! Check /bingo help for info"
+    # When a user from the console tries to do something that needs to be an in-game player
+    must_be_player: "You must be a player to do that!"
+    # When introducing a player that doesn`t exist in the server in a command
+    player_does_not_exist: "That player does´t exist or isn´t connected to the server!"
+    # When calling a Player that isn´t playing the Game
+    player_not_in_game: "That player is playing the game!"
+  help:
+    # List of the contents tha will display the /bingo help command
+    # /bingo generate advice
+    generate: "Generates a new Bingo Card based on the introduced seed"
+    # /bingo card advice
+    card: "Shows the bingo card that will be given to the players"
+    # /bingo card <Player> advice
+    card_of_player: "Shows the bingo card of the introduced player"
+    # /bingo options advice
+    options: "Opens the Bingo Game Options Menu"
+    # /bingo start advice
+    start: "Starts the Bingo Match"
+    # /bingo stop advice
+    stop: "Forces the end of the game"
+    # /bingo reload advice
+    reload: "Reload the bingo config (cards.yml, lang.yml, config.yml)"
+    # /bingocard advice
+    bingocard: "Shows the your personal card if you are playing"
+    # /bingo help advice
+    help: "Show this list"
+  config:
+    # Message shown to the sender of the /bingo reload command
+
+    reload: "Config Reloaded!"

@@ -1,0 +1,18 @@
+name: BingoEspectral
+version: '1.0'
+main: net.espectralgames.bingoEspectral.BingoEspectral
+api-version: '1.21'
+prefix: Bingo
+authors: [ MarkManFlame_55 ]
+description: Item Bingo plugin. Made for Espectral Games.
+website: https://discord.gg/4XmkGKM4gV
+permissions:
+  bingo.host:
+    description: Permissions to the /bingo commands
+    default: op
+commands:
+  bingo:
+    description: Comando principal de bingo
+    permission: bingo.host
+  bingocard:
+    description: Comando para ver la carta personal de Bingo!
