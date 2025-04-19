@@ -4,8 +4,10 @@ import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.events.BingoEvents;
 import net.espectralgames.bingoEspectral.commands.bingoCommand;
 import net.espectralgames.bingoEspectral.commands.bingocardCommand;
+import net.espectralgames.bingoEspectral.expansion.BingoExpansion;
 import net.espectralgames.bingoEspectral.item.BingoCardItem;
 import net.espectralgames.bingoEspectral.ui.listeners.MenuListeners;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -17,7 +19,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-import javax.swing.event.TableModelListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -27,13 +28,15 @@ public final class BingoEspectral extends JavaPlugin {
     private BingoGame bingoGame;
     private File cardsFile, langFile;
     private YamlConfiguration cardsConfig = new YamlConfiguration();
-    private YamlConfiguration langConfig = new YamlConfiguration();
+    private LangConfig langConfig = new LangConfig();
+    private BingoExpansion expansion;
 
 
     @Override
     public void onEnable() {
         plugin = this;
         bingoGame = new BingoGame();
+        //expansion.register();
 
         saveDefaultConfig();
 
@@ -89,7 +92,7 @@ public final class BingoEspectral extends JavaPlugin {
             cardsConfig.load(cardsFile);
             this.getLogger().info("cards.yml configuration loaded!");
             langConfig.load(langFile);
-            this.getLogger().info("lang.yml configuration loaded!");
+            this.getComponentLogger().info("lang.yml configuration loaded!");
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
@@ -118,7 +121,7 @@ public final class BingoEspectral extends JavaPlugin {
 
     }
 
-    public YamlConfiguration getLangConfig() {
+    public LangConfig getLangConfig() {
         return langConfig;
     }
 
@@ -128,7 +131,7 @@ public final class BingoEspectral extends JavaPlugin {
     }
 
     public void reloadLangConfig() {
-        this.langConfig = YamlConfiguration.loadConfiguration(langFile);
+        this.langConfig = (LangConfig) YamlConfiguration.loadConfiguration(langFile);
         this.getLogger().info("lang.yml configuration reloaded!");
     }
 

@@ -1,32 +1,24 @@
 package net.espectralgames.bingoEspectral.bingo.events;
 
 import net.espectralgames.bingoEspectral.BingoEspectral;
-import net.espectralgames.bingoEspectral.bingo.BingoBox;
-import net.espectralgames.bingoEspectral.bingo.BingoCard;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.BingoPlayer;
+import net.espectralgames.bingoEspectral.bingo.options.BingoType;
 import net.espectralgames.bingoEspectral.item.BingoCardItem;
 import net.espectralgames.bingoEspectral.ui.Menu;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import org.bukkit.*;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerRecipeBookSettingsChangeEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.CrafterInventory;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,11 +70,11 @@ public class BingoEvents implements Listener {
 
         if (e.getWhoClicked() instanceof Player player) {
             if (this.bingoGame.isStarted()) {
-                BingoPlayer bingoPlayer = this.bingoGame.getPlayer(player);
+                final BingoPlayer bingoPlayer = this.bingoGame.getPlayer(player);
                 if (bingoPlayer == null) return;
-                ItemStack itemStack = e.getCurrentItem();
+                final ItemStack itemStack = e.getCurrentItem();
                 if (itemStack != null && !itemStack.isSimilar(BingoCardItem.item())) {
-                    Material material = itemStack.getType();
+                    final Material material = itemStack.getType();
                     if (bingoPlayer.getPersonalCard().discardItem(material)) {
                         if (this.bingoGame.getOptions().isRemoveMarkedItems()) {
                             itemStack.subtract();
@@ -102,15 +94,23 @@ public class BingoEvents implements Listener {
     }
 
     private void playerFoundItem(BingoPlayer bingoPlayer, Material material) {
-        final YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         final Player player = bingoPlayer.getPlayer();
 
         for (Player p : server.getOnlinePlayers()) {
-            p.sendMessage(TextBuilder.success(lang.getString("bingo.game.item_found").replace("%player%", player.getName()).replace("%item%", "<lang:" + material.getItemTranslationKey() + ">")));
+            p.sendMessage(TextBuilder.success(lang.game("item_found").replace("%player%", player.getName()).replace("%item%", "<lang:" + material.getItemTranslationKey() + ">")));
             p.playSound(p, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.AMBIENT, 1.0f, 1.0f);
         }
 
         if (this.bingoGame.getOptions().isFullCard()) {
+
+            if (bingoPlayer.getPersonalCard().hasBingo(BingoType.ALL)) {
+                for (Player p : server.getOnlinePlayers()) {
+                    p.sendMessage(TextBuilder.success(lang.game("bingo_scored").replace("%player%", player.getName())));
+                    p.playSound(p, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.AMBIENT, 1.0f, 1.0f);
+                }
+            }
+
             if (bingoPlayer.getPersonalCard().isCompleted()) {
                 this.bingoGame.finishGame(bingoPlayer);
             }
@@ -125,10 +125,10 @@ public class BingoEvents implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         if (this.bingoGame.getOptions().isHardcore()) {
-            final YamlConfiguration lang = this.plugin.getLangConfig();
+            final LangConfig lang = this.plugin.getLangConfig();
             final Player player = e.getPlayer();
             player.setGameMode(GameMode.SPECTATOR);
-            player.sendMessage(TextBuilder.minimessage(lang.getString("bingo.game.disqualified")));
+            player.sendMessage(TextBuilder.info(lang.game("disqualified")));
             for (Player p : this.server.getOnlinePlayers()) {
                 p.playSound(p, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, SoundCategory.AMBIENT, 1.0f, 0.1f);
             }
@@ -141,7 +141,7 @@ public class BingoEvents implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         if (this.bingoGame.isStarted()) {
             final Player player = e.getPlayer();
             if (this.bingoGame.getPlayer(player) == null) {
@@ -152,7 +152,7 @@ public class BingoEvents implements Listener {
                     specs.addEntity(player);
                 }
 
-                player.sendMessage(TextBuilder.info(lang.getString("bingo.game.game_already_started")));
+                player.sendMessage(TextBuilder.info(lang.game("game_already_started")));
             }
         }
     }

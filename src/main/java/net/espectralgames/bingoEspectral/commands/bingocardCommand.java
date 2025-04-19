@@ -4,6 +4,8 @@ import net.espectralgames.bingoEspectral.BingoEspectral;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.BingoPlayer;
 import net.espectralgames.bingoEspectral.ui.BingoCardMenu;
+import net.espectralgames.bingoEspectral.utils.ErrorMessage;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
@@ -31,7 +33,7 @@ public class bingocardCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] strings) {
-        YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         if (commandSender instanceof Player player) {
             BingoPlayer bingoPlayer = this.bingoGame.getPlayer(player);
             if (bingoPlayer != null) {
@@ -39,13 +41,13 @@ public class bingocardCommand implements TabExecutor {
                     player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);
                     new BingoCardMenu(bingoPlayer.getPersonalCard()).open(player);
                 } else {
-                    player.sendMessage(TextBuilder.error(lang.getString("bingo.error.cant_open_bingo_card")));
+                    player.sendMessage(TextBuilder.error(lang.error(ErrorMessage.CANT_OPEN_BINGO_CARD)));
                 }
             } else {
-                player.sendMessage(TextBuilder.error(lang.getString("bingo.error.cant_open_bingo_card")));
+                player.sendMessage(TextBuilder.error(lang.error(ErrorMessage.CANT_OPEN_BINGO_CARD)));
             }
         } else {
-            commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.must_be_player")));
+            commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.MUST_BE_PLAYER)));
         }
         return true;
     }

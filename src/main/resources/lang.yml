@@ -14,6 +14,8 @@ bingo:
     options_title: "Bingo Options"
     # Inventory name for the bingo card display
     card_title: "Your Bingo Card!"
+    # Message before displaying founders of this item on the card
+    found_by: "<gray>Found by:"
     # Name of the /bingo options items
     display_time: "<yellow>Show time on Action Bar:"
     max_time: "<yellow>Max Time:"
@@ -51,6 +53,9 @@ bingo:
     player_won_points: "<b><light_purple> %player%</b><white> won with %count% points!"
     # When a player has died on hardcore mode
     disqualified: "<red>You died and lost the game! :("
+    # When a player scores a Bingo in Full Card mode
+    # (Variables: %player% - Player that scored the Bingo)
+    bingo_scored: "%player% has scored <gold>Bingo!"
     # End of game title.
     # Variables: %player% - Player that won the game.
     win:
@@ -60,6 +65,10 @@ bingo:
     bingo_card_item:
       item_name: "<light_purple>Bingo Card!"
       description: "<gray>Right Click to see your Bingo Card!"
+  team:
+    message: "[%team_prefix%] %player% <gray>>></gray> %message%"
+    player_join: "%player% joined your team"
+    player_leave: "%player% left the team"
   error:
     # When a player tries to open the Bingo Card item, bute there´s no bingo card yet
     cant_open_bingo_card: "You can´t open your Bingo Card if it´s not generated!"

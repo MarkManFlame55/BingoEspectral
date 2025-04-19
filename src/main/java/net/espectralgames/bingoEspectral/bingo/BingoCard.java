@@ -193,6 +193,18 @@ public class BingoCard {
         return markedItems;
     }
 
+    public boolean isMarked(Material material) {
+        for (int i = 0; i < this.bingoCard.length; i++) {
+            for (int j = 0; j < this.bingoCard[i].length; j++) {
+                final BingoBox element = this.getElementAt(i,j);
+                if (element.getMaterial().equals(material)) {
+                    return element.isMarked();
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Marks down an item in the card
      *

@@ -3,6 +3,8 @@
 # Developed for EspectralGames
 #
 
+#
+spread-distance: 2000
 # The maximun distance the players can go away while waiting to start
 spawn-max-distance: 32
 # The name of the team that is asigned to the spectators of the game

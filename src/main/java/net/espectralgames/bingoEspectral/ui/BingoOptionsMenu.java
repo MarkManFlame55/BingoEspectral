@@ -3,6 +3,7 @@ package net.espectralgames.bingoEspectral.ui;
 import net.espectralgames.bingoEspectral.BingoEspectral;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.options.BingoType;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -21,10 +22,10 @@ public class BingoOptionsMenu extends SimpleMenu {
 
     private final BingoEspectral plugin = BingoEspectral.getPlugin();
     private final BingoGame game = this.plugin.getBingoGame();
-    private final YamlConfiguration lang = this.plugin.getLangConfig();
+    private final LangConfig lang = this.plugin.getLangConfig();
 
     public BingoOptionsMenu() {
-        super(Rows.FOUR, BingoEspectral.getPlugin().getLangConfig().getString("bingo.ui.options_title"));
+        super(Rows.FOUR, BingoEspectral.getPlugin().getLangConfig().ui("options_title"));
     }
 
     @Override
@@ -111,7 +112,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack removeOnMarkItem() {
         ItemStack itemStack = new ItemStack(Material.LAVA_BUCKET);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.delete_items")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("delete_items")));
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isRemoveMarkedItems()) {
@@ -131,7 +132,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack keepInventoryItem() {
         ItemStack itemStack = new ItemStack(Material.BUNDLE);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.keep_inventory")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("keep_inventory")));
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isKeepInventory()) {
@@ -151,7 +152,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack fullcardItem() {
         ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.full_card")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("full_card")));
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isFullCard()) {
@@ -171,7 +172,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack uhcmodeItem() {
         ItemStack itemStack = new ItemStack(Material.GOLDEN_APPLE);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.uhc")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("uhc")));
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isUhcmode()) {
             lore.add(Component.text(""));
@@ -191,7 +192,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack timelimitItem() {
         ItemStack itemStack = new ItemStack(Material.CLOCK);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.time_limit")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("time_limit")));
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isTimeLimit()) {
             lore.add(Component.text(""));
@@ -210,7 +211,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack hardcoreItem() {
         ItemStack itemStack = new ItemStack(Material.TOTEM_OF_UNDYING);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.hardcore")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("hardcore")));
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isHardcore()) {
             lore.add(Component.text(""));
@@ -230,7 +231,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack tipoBingoItem() {
         ItemStack itemStack = new ItemStack(Material.WRITABLE_BOOK);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.bingo_type")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("bingo_type")));
         if (this.game.getOptions().getType() != null) {
             BingoType type = this.game.getOptions().getType();
             switch (type) {
@@ -279,7 +280,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack pvpItem() {
         ItemStack itemStack = new ItemStack(Material.IRON_SWORD);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.pvp")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("pvp")));
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isPvp()) {
@@ -299,7 +300,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack displayTimeItem() {
         ItemStack itemStack = new ItemStack(Material.REDSTONE_LAMP);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.display_time")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("display_time")));
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         List<Component> lore = new ArrayList<>();
         if (this.game.getOptions().isDisplayTime()) {
@@ -318,7 +319,7 @@ public class BingoOptionsMenu extends SimpleMenu {
     private ItemStack maxTimeItem() {
         ItemStack itemStack = new ItemStack(Material.REPEATER);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.ui.max_time")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("max_time")));
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         List<Component> lore = new ArrayList<>();
 
@@ -328,7 +329,7 @@ public class BingoOptionsMenu extends SimpleMenu {
 
         lore.add(TextBuilder.minimessage("<gray>" + String.format("%02d", hours) + "h" + String.format("%02d", minutes) + "min"));
         lore.add(Component.text(""));
-        lore.add(TextBuilder.minimessage(lang.getString("bingo.ui.click_to_open")));
+        lore.add(TextBuilder.minimessage(lang.ui("click_to_open")));
         itemMeta.lore(lore);
         itemStack.setItemMeta(itemMeta);
         return itemStack;

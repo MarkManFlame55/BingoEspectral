@@ -1,12 +1,24 @@
 package net.espectralgames.bingoEspectral.bingo;
 
+import com.google.common.base.Preconditions;
+import net.espectralgames.bingoEspectral.BingoEspectral;
+import net.espectralgames.bingoEspectral.bingo.team.BingoTeam;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
+import net.espectralgames.bingoEspectral.utils.TextBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class BingoPlayer {
+
+    private final BingoEspectral plugin = BingoEspectral.getPlugin();
 
     private final Player player;
     private BingoGame game;
     private BingoCard personalCard;
+    private @Nullable BingoTeam team;
 
     public BingoPlayer(Player player) {
         this.player = player;
@@ -37,5 +49,34 @@ public class BingoPlayer {
             return bingoPlayer.getPlayer().getUniqueId().equals(this.getPlayer().getUniqueId());
         }
         return false;
+    }
+
+    public @Nullable BingoTeam getTeam() {
+        return team;
+    }
+
+    public void setTeam(@Nullable BingoTeam team) {
+        this.team = team;
+    }
+
+    public void sendMessage(Component message) {
+        this.player.sendMessage(message);
+    }
+
+    public void sendTeamMessage(String message) {
+        if (this.team != null) {
+            final LangConfig lang = this.plugin.getLangConfig();
+            String team_message = lang.team("message");
+            Preconditions.checkNotNull(team_message, "bingo.team.message is null!");
+            this.team.sendMessage(
+                    TextBuilder.minimessage(team_message
+                            .replace("%team_prefix", this.team.getPrefix())
+                            .replace("%player%", this.player.getName())
+                            .replace("%message%", message)));
+        }
+    }
+
+    public String getName() {
+        return this.getPlayer().getName();
     }
 }

@@ -2,13 +2,15 @@ package net.espectralgames.bingoEspectral.bingo;
 
 import net.espectralgames.bingoEspectral.BingoEspectral;
 import net.espectralgames.bingoEspectral.bingo.options.BingoOptions;
+import net.espectralgames.bingoEspectral.bingo.team.BingoTeam;
 import net.espectralgames.bingoEspectral.item.BingoCardItem;
+import net.espectralgames.bingoEspectral.utils.ErrorMessage;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,9 +23,7 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class BingoGame {
 
@@ -32,6 +32,7 @@ public class BingoGame {
     private final List<BingoPlayer> players = new ArrayList<>();
     private final BingoOptions options = new BingoOptions();
     private final BingoCard bingoCard = new BingoCard();
+    private final Set<BingoTeam> bingoTeams = new HashSet<>();
     private Team spectatorTeam;
     private boolean started;
     private boolean waitingToStart = true;
@@ -88,11 +89,21 @@ public class BingoGame {
      */
     public boolean addPlayer(Player player) {
         BingoPlayer bingoPlayer = new BingoPlayer(player);
-        if (players.contains(bingoPlayer)) {
+        return addPlayer(bingoPlayer);
+    }
+
+    /**
+     * Adds a player to the Game Playerlist
+     *
+     * @param bingoPlayer Player to add into the game
+     * @return {@code true} if the player was added succesfully, of {@code false} if not
+     */
+    public boolean addPlayer(BingoPlayer bingoPlayer) {
+        if (this.players.contains(bingoPlayer)) {
             return false;
         } else {
             bingoPlayer.setGame(this);
-            players.add(bingoPlayer);
+            this.players.add(bingoPlayer);
             return true;
         }
     }
@@ -124,7 +135,7 @@ public class BingoGame {
      * Starts the game, giving a copy of the bingo card to each bingo player
      */
     public void startGame() {
-        final YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         final Server server = Bukkit.getServer();
         final Random random = new Random();
         waitingToStart = false;
@@ -141,7 +152,7 @@ public class BingoGame {
                 player.setGameMode(GameMode.SPECTATOR);
                 getSpectatorTeam().addEntity(player);
             }
-            player.showTitle(Title.title(TextBuilder.minimessage(lang.getString("bingo.game.starting_countdown")), Component.text(""), Title.Times.times(Duration.ofMillis(1), Duration.ofSeconds(3), Duration.ofMillis(1))));
+            player.showTitle(Title.title(TextBuilder.minimessage(lang.game("starting_countdown")), Component.text(""), Title.Times.times(Duration.ofMillis(1), Duration.ofSeconds(3), Duration.ofMillis(1))));
         }
 
 
@@ -158,7 +169,7 @@ public class BingoGame {
                     counter--;
                 } else {
                     for (Player player : server.getOnlinePlayers()) {
-                        player.showTitle(Title.title(TextBuilder.minimessage(lang.getString("bingo.game.game_starts")), Component.text(""), Title.Times.times(Duration.ofMillis(1), Duration.ofSeconds(3), Duration.ofMillis(1))));
+                        player.showTitle(Title.title(TextBuilder.minimessage(lang.game("game_starts")), Component.text(""), Title.Times.times(Duration.ofMillis(1), Duration.ofSeconds(3), Duration.ofMillis(1))));
                         player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.AMBIENT, 1.0f, 1.0f);
                         player.removePotionEffect(PotionEffectType.SLOWNESS);
                         player.removePotionEffect(PotionEffectType.BLINDNESS);
@@ -205,6 +216,13 @@ public class BingoGame {
             // TP, Respawn Point y /clear
             player.teleport(location);
 
+            // Unlock recipes
+            server.recipeIterator().forEachRemaining(recipe -> {
+                if (recipe instanceof Keyed keyedRecipe)  {
+                    player.discoverRecipe(keyedRecipe.getKey());
+                }
+            });
+
             Block spawnBlock = player.getWorld().getBlockAt(location.clone().add(0,-1, 0));
             if (spawnBlock.isLiquid()) {
                 player.getWorld().setBlockData(spawnBlock.getLocation(), Bukkit.createBlockData(Material.BEDROCK));
@@ -234,7 +252,7 @@ public class BingoGame {
      * Finishes the game with no winners
      */
     public void finishGame() {
-        final YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         final Server server = Bukkit.getServer();
         this.started = false;
 
@@ -244,7 +262,7 @@ public class BingoGame {
             World overworld = server.getWorlds().getFirst();
             Location pos = new Location(overworld, 0.5, overworld.getHighestBlockYAt(0,0)+1, 0.5);
             player.teleport(pos);
-            player.sendMessage(TextBuilder.error(lang.getString("bingo.game.game_stopped")));
+            player.sendMessage(TextBuilder.error(lang.game("game_stopped")));
             player.setRespawnLocation(pos, true);
             player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
             waitingToStart = true;
@@ -279,7 +297,7 @@ public class BingoGame {
      * @param winner Winner of the Game
      */
     public void finishGame(BingoPlayer winner) {
-        final YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         final Server server = Bukkit.getServer();
         this.started = false;
 
@@ -287,10 +305,10 @@ public class BingoGame {
 
         for (Player player : server.getOnlinePlayers()) {
             player.showTitle(Title.title(
-                    TextBuilder.minimessage(lang.getString("bingo.game.win.title").replace("%player%", winner.getPlayer().getName())),
-                    TextBuilder.minimessage(lang.getString("bingo.game.win.subtitle").replace("%player%", winner.getPlayer().getName())),
+                    TextBuilder.minimessage(lang.game("win.title").replace("%player%", winner.getPlayer().getName())),
+                    TextBuilder.minimessage(lang.game("win.subtitle").replace("%player%", winner.getPlayer().getName())),
                     Title.Times.times(Duration.ofMillis(1), Duration.ofSeconds(5), Duration.ofMillis(1))));
-            player.sendMessage(TextBuilder.info(lang.getString("bingo.game.player_won_points")
+            player.sendMessage(TextBuilder.info(lang.game("player_won_points")
                     .replace("%player%", winner.getPlayer().getName())
                     .replace("%count%", String.valueOf(winner.getPersonalCard().getMarkedItemCount()))));
             player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.AMBIENT, 0.8f, 1.0f);
@@ -327,7 +345,7 @@ public class BingoGame {
      * Sequence of actions that are repeatedly executing while on Waiting Mode
      */
     public void waitingSequence() {
-        final YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         final World overworld = server.getWorlds().getFirst();
         final Location center = new Location(overworld, 0.5, overworld.getHighestBlockYAt(0,0, HeightMap.MOTION_BLOCKING)+1, 0.5);
 
@@ -337,7 +355,7 @@ public class BingoGame {
 
         for (Player player : server.getOnlinePlayers()) {
 
-            player.sendActionBar(TextBuilder.minimessage(lang.getString("bingo.game.waiting_to_start")));
+            player.sendActionBar(TextBuilder.minimessage(lang.game("waiting_to_start")));
             player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 60, 255, false, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 60, 255, false, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 60, 255, false, false, false));
@@ -348,7 +366,7 @@ public class BingoGame {
                 if (!player.getGameMode().isInvulnerable()) {
                     player.teleport(center);
                     player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
-                    player.sendMessage(TextBuilder.error(lang.getString("bingo.error.u_cant_escape")));
+                    player.sendMessage(TextBuilder.error(lang.error(ErrorMessage.U_CANT_ESCAPE)));
                 }
             }
             if (player.getGameMode().equals(GameMode.SURVIVAL)) {
@@ -374,14 +392,14 @@ public class BingoGame {
             public void run() {
                 if (!started) this.cancel();
 
-                final YamlConfiguration lang = plugin.getLangConfig();
+                final LangConfig lang = plugin.getLangConfig();
                 final int hours = totalSeconds / 3600;
                 final int minutes = (totalSeconds % 3600) / 60;
                 final int seconds = totalSeconds % 60;
 
                 for (Player player : server.getOnlinePlayers()) {
-                    if (lang.getString("bingo.game.total_game_time") != null) {
-                        player.sendActionBar(TextBuilder.minimessage(lang.getString("bingo.game.total_game_time")
+                    if (lang.game("total_game_time") != null) {
+                        player.sendActionBar(TextBuilder.minimessage(lang.game("total_game_time")
                                 .replace("%h%", String.format("%02d", hours))
                                 .replace("%m%", String.format("%02d", minutes))
                                 .replace("%s%", String.format("%02d", seconds))));
@@ -423,11 +441,6 @@ public class BingoGame {
             world.setGameRule(GameRule.KEEP_INVENTORY, false);
             world.setHardcore(false);
             world.setPVP(true);
-            for (String gr : world.getGameRules()) {
-                GameRule<?> gameRule = GameRule.getByName(gr);
-                assert gameRule != null;
-                Object defaultValue = gameRule.getType();
-            }
         }
     }
 }

@@ -4,6 +4,8 @@ import net.espectralgames.bingoEspectral.BingoEspectral;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.BingoPlayer;
 import net.espectralgames.bingoEspectral.ui.BingoCardMenu;
+import net.espectralgames.bingoEspectral.utils.ErrorMessage;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -23,19 +25,19 @@ import java.util.List;
 
 public class BingoCardItem implements Listener {
 
-    static final BingoEspectral plugin = BingoEspectral.getPlugin();
-    static final BingoGame bingoGame = plugin.getBingoGame();
+    private static final BingoEspectral plugin = BingoEspectral.getPlugin();
+    private static final BingoGame bingoGame = plugin.getBingoGame();
 
     public static ItemStack item() {
-        YamlConfiguration lang = plugin.getLangConfig();
+        final LangConfig lang = plugin.getLangConfig();
         ItemStack itemStack = new ItemStack(Material.PAPER);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(TextBuilder.minimessage(lang.getString("bingo.game.bingo_card_item.item_name")));
+        itemMeta.displayName(TextBuilder.minimessage(lang.game("bingo_card_item.item_name")));
         itemMeta.setRarity(ItemRarity.EPIC);
         itemMeta.setMaxStackSize(1);
         itemMeta.setEnchantmentGlintOverride(true);
         List<Component> lore = new ArrayList<>();
-        lore.add(TextBuilder.minimessage(lang.getString("bingo.game.bingo_card_item.description")));
+        lore.add(TextBuilder.minimessage(lang.game("bingo_card_item.description")));
         itemMeta.lore(lore);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -43,7 +45,7 @@ public class BingoCardItem implements Listener {
 
     @EventHandler
     public static void onPlayerInteract(PlayerInteractEvent e) {
-        YamlConfiguration lang = plugin.getLangConfig();
+        final LangConfig lang = plugin.getLangConfig();
         if (e.getAction().isRightClick()) {
             ItemStack itemStack = e.getItem();
             if (itemStack != null && itemStack.isSimilar(item())) {
@@ -54,7 +56,7 @@ public class BingoCardItem implements Listener {
                 if (bingoPlayer != null && bingoPlayer.getPersonalCard() != null) {
                     new BingoCardMenu(bingoPlayer.getPersonalCard()).open(player);
                 } else {
-                    player.sendMessage(TextBuilder.error(lang.getString("bingo.error.cant_open_bingo_card")));
+                    player.sendMessage(TextBuilder.error(lang.error(ErrorMessage.CANT_OPEN_BINGO_CARD)));
                 }
 
             }

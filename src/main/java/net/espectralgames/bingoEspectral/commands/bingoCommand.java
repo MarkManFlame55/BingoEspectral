@@ -5,6 +5,8 @@ import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.BingoPlayer;
 import net.espectralgames.bingoEspectral.ui.BingoCardMenu;
 import net.espectralgames.bingoEspectral.ui.BingoOptionsMenu;
+import net.espectralgames.bingoEspectral.utils.ErrorMessage;
+import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -18,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +31,9 @@ public class bingoCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] args) {
-        final YamlConfiguration lang = this.plugin.getLangConfig();
+        final LangConfig lang = this.plugin.getLangConfig();
         if (args.length < 1) {
-            commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.bad_command_arguments")));
+            commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.BAD_COMMAND_ARGUMENTS)));
         } else {
 
             if (args.length == 1) {
@@ -41,7 +44,7 @@ public class bingoCommand implements TabExecutor {
                             if (this.bingoGame.getBingoCard() != null) {
                                 new BingoCardMenu(this.bingoGame.getBingoCard()).open(player);
                             } else {
-                                commandSender.sendMessage(TextBuilder.minimessage(lang.getString("bingo.error.cant_open_bingo_card")));
+                                commandSender.sendMessage(TextBuilder.minimessage(lang.error(ErrorMessage.CANT_OPEN_BINGO_CARD)));
                             }
 
                         }
@@ -50,7 +53,7 @@ public class bingoCommand implements TabExecutor {
                         if (commandSender instanceof Player sender) {
                             new BingoOptionsMenu().open(sender);
                         } else {
-                            commandSender.sendMessage(TextBuilder.minimessage(lang.getString("bingo.error.must_be_player")));
+                            commandSender.sendMessage(TextBuilder.minimessage(lang.error(ErrorMessage.MUST_BE_PLAYER)));
                         }
                     }
                     case "stop" -> {
@@ -78,7 +81,7 @@ public class bingoCommand implements TabExecutor {
                         if (this.bingoGame.getBingoCard().isGenerated()) {
                             this.bingoGame.startGame();
                         } else {
-                            commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.cant_start_without_card")));
+                            commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.CANT_START_WITHOUT_CARD)));
                             if (commandSender instanceof Player sender) sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
                         }
 
@@ -87,24 +90,24 @@ public class bingoCommand implements TabExecutor {
                         this.plugin.reloadConfig();
                         this.plugin.reloadCardsConfig();
                         this.plugin.reloadLangConfig();
-                        commandSender.sendMessage(TextBuilder.success(lang.getString("bingo.config.reload")));
+                        commandSender.sendMessage(TextBuilder.success(lang.config("reload")));
                         if (commandSender instanceof Player sender) sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);
                     }
                     case "generate" -> {
                         String seed = this.plugin.getConfig().getString("last-bingo-seed-played");
                         if (this.bingoGame.getBingoCard().generate(seed) != null) {
-                            commandSender.sendMessage(TextBuilder.success(lang.getString("bingo.game.card_generated")));
+                            commandSender.sendMessage(TextBuilder.success(lang.game("card_generated")));
                             commandSender.sendMessage(TextBuilder.info("<aqua>Seed: <white>" + seed));
                             if (commandSender instanceof Player sender)
                                 sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);
                         } else {
-                            commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.failed_card_generation")));
+                            commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.FAILED_CARD_GENERATION)));
                             if (commandSender instanceof Player sender)
                                 sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
                         }
                     }
                     default -> {
-                        commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.bad_command_arguments")));
+                        commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.BAD_COMMAND_ARGUMENTS)));
                         if (commandSender instanceof Player sender) sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
                     }
                 }
@@ -115,11 +118,11 @@ public class bingoCommand implements TabExecutor {
                     case "generate" -> {
                         String seed = args[1];
                         if (this.bingoGame.getBingoCard().generate(seed) != null) {
-                            commandSender.sendMessage(TextBuilder.success(lang.getString("bingo.game.card_generated")));
+                            commandSender.sendMessage(TextBuilder.success(lang.game("card_generated")));
                             if (commandSender instanceof Player sender)
                                 sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);
                         } else {
-                            commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.failed_card_generation")));
+                            commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.FAILED_CARD_GENERATION)));
                             if (commandSender instanceof Player sender)
                                 sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
                         }
@@ -133,19 +136,19 @@ public class bingoCommand implements TabExecutor {
                                     new BingoCardMenu(bingoPlayer.getPersonalCard()).open(sender);
                                     player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);
                                 } else {
-                                    commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.player_not_in_game")));
+                                    commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.PLAYER_NOT_IN_GAME)));
                                     sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
                                 }
                             } else {
-                                commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.player_does_not_exist")));
+                                commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.PLAYER_DOES_NOT_EXIST)));
                                 sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
                             }
                         } else {
-                            commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.must_be_player")));
+                            commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.MUST_BE_PLAYER)));
                         }
                     }
                     default -> {
-                        commandSender.sendMessage(TextBuilder.error(lang.getString("bingo.error.bad_command_arguments")));
+                        commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.BAD_COMMAND_ARGUMENTS)));
                         if (commandSender instanceof Player sender) sender.playSound(sender, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
                     }
                 }
