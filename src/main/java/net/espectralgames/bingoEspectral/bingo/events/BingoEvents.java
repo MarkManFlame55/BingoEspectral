@@ -101,7 +101,7 @@ public class BingoEvents implements Listener {
             p.sendMessage(TextBuilder.success(lang.game("item_found").replace("%player%", player.getName()).replace("%item%", "<lang:" + material.getItemTranslationKey() + ">")));
             p.playSound(p, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.AMBIENT, 1.0f, 1.0f);
         }
-
+        bingoPlayer.addPoints(this.bingoGame.getOptions().getPointePerItem());
         if (this.bingoGame.getOptions().isFullCard()) {
 
             if (bingoPlayer.getPersonalCard().hasBingo(BingoType.ALL)) {
@@ -109,6 +109,7 @@ public class BingoEvents implements Listener {
                     p.sendMessage(TextBuilder.success(lang.game("bingo_scored").replace("%player%", player.getName())));
                     p.playSound(p, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.AMBIENT, 1.0f, 1.0f);
                 }
+                bingoPlayer.addPoints(this.bingoGame.getOptions().getPointsPerBingo());
             }
 
             if (bingoPlayer.getPersonalCard().isCompleted()) {
@@ -116,6 +117,7 @@ public class BingoEvents implements Listener {
             }
         } else {
             if (bingoPlayer.getPersonalCard().hasBingo(this.bingoGame.getOptions().getType())) {
+                bingoPlayer.addPoints(this.bingoGame.getOptions().getPointsPerBingo());
                 this.bingoGame.finishGame(bingoPlayer);
             }
         }

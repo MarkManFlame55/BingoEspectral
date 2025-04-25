@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,16 +24,26 @@ public class BingoCardMenu extends SimpleMenu {
     private final BingoEspectral plugin = BingoEspectral.getPlugin();
     private final BingoCard bingoCard;
     private final BingoGame bingoGame = this.plugin.getBingoGame();
+    private BingoPlayer player;
     private final LangConfig lang = this.plugin.getLangConfig();
 
     public BingoCardMenu(BingoCard bingoCard) {
         super(Rows.FIVE, BingoEspectral.getPlugin().getLangConfig().getString("bingo.ui.card_title"));
         this.bingoCard = bingoCard;
     }
-    public BingoCardMenu(BingoCard bingoCard, String titleKey) {
+
+    public BingoCardMenu(BingoCard bingoCard, BingoPlayer bingoPlayer) {
+        super(Rows.FIVE, BingoEspectral.getPlugin().getLangConfig().getString("bingo.ui.card_title"));
+        this.bingoCard = bingoCard;
+        this.player = bingoPlayer;
+    }
+
+    public BingoCardMenu(BingoCard bingoCard, String titleKey, BingoPlayer bingoPlayer) {
         super(Rows.FIVE, titleKey);
         this.bingoCard = bingoCard;
     }
+
+
 
     @Override
     public void onSetItems() {
@@ -92,11 +103,29 @@ public class BingoCardMenu extends SimpleMenu {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.displayName(MiniMessage.miniMessage().deserialize("<green><lang:" + material.getItemTranslationKey() + ">").decoration(TextDecoration.ITALIC, false));
         itemMeta.setEnchantmentGlintOverride(true);
+        final List<String> playerWithItem = new ArrayList<>();
         final List<Component> lore = new ArrayList<>();
-        lore.add(TextBuilder.minimessage(lang.ui("found_by")));
-        for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
-            if (bingoPlayer.getPersonalCard().isMarked(material)) {
-                lore.add(TextBuilder.minimessage("<white>- <gray>" + bingoPlayer.getName()));
+
+        if (this.player == null) {
+            for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
+                if (bingoPlayer.getPersonalCard().isMarked(material)) {
+                    playerWithItem.add(bingoPlayer.getName());
+                }
+            }
+        } else {
+            for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
+                if (!bingoPlayer.equals(this.player)) {
+                    if (bingoPlayer.getPersonalCard().isMarked(material)) {
+                        playerWithItem.add(bingoPlayer.getName());
+                    }
+                }
+            }
+        }
+
+        if (!playerWithItem.isEmpty()) {
+            lore.add(TextBuilder.minimessage(lang.ui("found_by")));
+            for (String name : playerWithItem) {
+                lore.add(TextBuilder.minimessage("<white>- <gray>" + name));
             }
         }
         itemMeta.lore(lore);
@@ -110,15 +139,33 @@ public class BingoCardMenu extends SimpleMenu {
 
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
+        final List<String> playerWithItem = new ArrayList<>();
         final List<Component> lore = new ArrayList<>();
-        lore.add(TextBuilder.minimessage(lang.ui("found_by")));
-        for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
-            if (bingoPlayer.getPersonalCard().isMarked(material)) {
-                lore.add(TextBuilder.minimessage("<white>- <gray>" + bingoPlayer.getName()));
+
+        if (this.player == null) {
+            for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
+                if (bingoPlayer.getPersonalCard().isMarked(material)) {
+                    playerWithItem.add(bingoPlayer.getName());
+                }
+            }
+        } else {
+            for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
+                if (!bingoPlayer.equals(this.player)) {
+                    if (bingoPlayer.getPersonalCard().isMarked(material)) {
+                        playerWithItem.add(bingoPlayer.getName());
+                    }
+                }
             }
         }
-        itemMeta.lore(lore);
 
+        if (!playerWithItem.isEmpty()) {
+            lore.add(TextBuilder.minimessage(lang.ui("found_by")));
+            for (String name : playerWithItem) {
+                lore.add(TextBuilder.minimessage("<white>- <gray>" + name));
+            }
+        }
+
+        itemMeta.lore(lore);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -130,4 +177,6 @@ public class BingoCardMenu extends SimpleMenu {
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
+
+
 }

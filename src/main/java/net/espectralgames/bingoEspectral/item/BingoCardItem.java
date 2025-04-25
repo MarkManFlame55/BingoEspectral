@@ -54,7 +54,7 @@ public class BingoCardItem implements Listener {
                 player.swingMainHand();
                 BingoPlayer bingoPlayer = bingoGame.getPlayer(player);
                 if (bingoPlayer != null && bingoPlayer.getPersonalCard() != null) {
-                    new BingoCardMenu(bingoPlayer.getPersonalCard()).open(player);
+                    new BingoCardMenu(bingoPlayer.getPersonalCard(), bingoPlayer).open(player);
                 } else {
                     player.sendMessage(TextBuilder.error(lang.error(ErrorMessage.CANT_OPEN_BINGO_CARD)));
                 }

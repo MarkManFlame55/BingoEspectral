@@ -59,6 +59,8 @@ public final class BingoEspectral extends JavaPlugin {
                 }
             }
         }.runTaskTimer(this, 0, 20);
+
+        //Bukkit.getScheduler().runTaskTimer(this, new BingoGameScore(), 0, 20);
     }
 
     @Override

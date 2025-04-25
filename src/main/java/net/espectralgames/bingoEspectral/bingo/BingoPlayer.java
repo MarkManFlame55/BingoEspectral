@@ -6,8 +6,6 @@ import net.espectralgames.bingoEspectral.bingo.team.BingoTeam;
 import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +17,7 @@ public class BingoPlayer {
     private BingoGame game;
     private BingoCard personalCard;
     private @Nullable BingoTeam team;
+    private int points = 0;
 
     public BingoPlayer(Player player) {
         this.player = player;
@@ -78,5 +77,17 @@ public class BingoPlayer {
 
     public String getName() {
         return this.getPlayer().getName();
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public void addPoints(int points) {
+        this.points += points;
     }
 }

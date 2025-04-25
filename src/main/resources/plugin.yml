@@ -1,5 +1,5 @@
 name: BingoEspectral
-version: '1.1'
+version: '1.2'
 main: net.espectralgames.bingoEspectral.BingoEspectral
 api-version: '1.21'
 prefix: Bingo

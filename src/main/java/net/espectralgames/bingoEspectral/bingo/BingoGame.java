@@ -3,6 +3,7 @@ package net.espectralgames.bingoEspectral.bingo;
 import net.espectralgames.bingoEspectral.BingoEspectral;
 import net.espectralgames.bingoEspectral.bingo.options.BingoOptions;
 import net.espectralgames.bingoEspectral.bingo.team.BingoTeam;
+import net.espectralgames.bingoEspectral.bingo.team.TeamManager;
 import net.espectralgames.bingoEspectral.item.BingoCardItem;
 import net.espectralgames.bingoEspectral.utils.ErrorMessage;
 import net.espectralgames.bingoEspectral.utils.LangConfig;
@@ -32,7 +33,7 @@ public class BingoGame {
     private final List<BingoPlayer> players = new ArrayList<>();
     private final BingoOptions options = new BingoOptions();
     private final BingoCard bingoCard = new BingoCard();
-    private final Set<BingoTeam> bingoTeams = new HashSet<>();
+    private final TeamManager teamManager = new TeamManager();
     private Team spectatorTeam;
     private boolean started;
     private boolean waitingToStart = true;
@@ -131,6 +132,10 @@ public class BingoGame {
         return options;
     }
 
+    public TeamManager getTeamManager() {
+        return teamManager;
+    }
+
     /**
      * Starts the game, giving a copy of the bingo card to each bingo player
      */
@@ -141,18 +146,24 @@ public class BingoGame {
         waitingToStart = false;
         started = true;
 
-        for (Player player : server.getOnlinePlayers()) {
-            if (getTeam(player) == null || !getTeam(player).getName().equalsIgnoreCase(this.spectatorTeam.getName())) {
-                if (!addPlayer(player)) {
-                    this.plugin.getLogger().warning(String.format("Failed to add %s to the game", player.getName()));
-                    player.setGameMode(GameMode.SPECTATOR);
-                    getSpectatorTeam().addEntity(player);
+        if (getOptions().isRandomTeams()) {
+            createRandomTeams();
+        }
+
+        for (BingoTeam bingoTeam : this.teamManager.getTeams()) {
+            for (BingoPlayer bingoPlayer : bingoTeam.getMembers()) {
+                Player player = bingoPlayer.getPlayer();
+                if (!addPlayer(bingoPlayer)) {
+                    this.plugin.getLogger().warning(String.format("%s is already on the game!", player.getName()));
                 }
-            } else {
-                player.setGameMode(GameMode.SPECTATOR);
-                getSpectatorTeam().addEntity(player);
             }
-            player.showTitle(Title.title(TextBuilder.minimessage(lang.game("starting_countdown")), Component.text(""), Title.Times.times(Duration.ofMillis(1), Duration.ofSeconds(3), Duration.ofMillis(1))));
+        }
+
+        for (Player player : server.getOnlinePlayers()) {
+            if (getPlayer(player) == null) {
+                getSpectatorTeam().addEntity(player);
+                player.setGameMode(GameMode.SPECTATOR);
+            }
         }
 
 
@@ -267,7 +278,7 @@ public class BingoGame {
             player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);
             waitingToStart = true;
         }
-
+        this.players.clear();
     }
 
 
@@ -441,6 +452,37 @@ public class BingoGame {
             world.setGameRule(GameRule.KEEP_INVENTORY, false);
             world.setHardcore(false);
             world.setPVP(true);
+        }
+    }
+
+    private void createRandomTeams() {
+        int teamSize = this.getOptions().getTeamSize();
+        int teamNumber = 1;
+
+        List<Player> onlinePlayers = new ArrayList<>(this.server.getOnlinePlayers());
+        Collections.shuffle(onlinePlayers);
+
+        for (int i = 0; i < onlinePlayers.size(); i += teamSize) {
+            BingoTeam bingoTeam = new BingoTeam();
+            bingoTeam.setColor(BingoTeam.randomColor());
+            bingoTeam.setPrefix(i + "");
+            bingoTeam.setTeamName(this.plugin.getConfig().getString("default-team-name").replace("%number%", String.valueOf(teamNumber)));
+            for (int j = 0; j < teamSize && i + j < onlinePlayers.size(); j++) {
+                Player player = onlinePlayers.get(i + j);
+                if (getPlayer(player) == null) {
+                    BingoPlayer bingoPlayer = new BingoPlayer(player);
+                    if (j == 0) bingoTeam.setOwner(bingoPlayer);
+                    bingoTeam.addMember(bingoPlayer);
+                } else {
+                    BingoPlayer bingoPlayer = getPlayer(player);
+                    if (bingoPlayer.getTeam() == null) {
+                        if (j == 0) bingoTeam.setOwner(bingoPlayer);
+                        bingoTeam.addMember(bingoPlayer);
+                    }
+                }
+            }
+            this.teamManager.registerTeam(bingoTeam);
+            teamNumber++;
         }
     }
 }

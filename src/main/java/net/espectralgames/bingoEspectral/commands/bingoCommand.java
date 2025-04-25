@@ -133,7 +133,7 @@ public class bingoCommand implements TabExecutor {
                             if (player != null) {
                                 BingoPlayer bingoPlayer = this.bingoGame.getPlayer(player);
                                 if (bingoPlayer != null) {
-                                    new BingoCardMenu(bingoPlayer.getPersonalCard()).open(sender);
+                                    new BingoCardMenu(bingoPlayer.getPersonalCard(), bingoPlayer).open(sender);
                                     player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);
                                 } else {
                                     commandSender.sendMessage(TextBuilder.error(lang.error(ErrorMessage.PLAYER_NOT_IN_GAME)));

@@ -6,11 +6,13 @@ import net.espectralgames.bingoEspectral.bingo.BingoPlayer;
 import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class BingoTeam {
 
@@ -30,6 +32,9 @@ public class BingoTeam {
         this.color = color;
         this.members = new ArrayList<>();
     }
+    public BingoTeam() {
+        this.members = new ArrayList<>();
+    }
 
 
     public void sendMessage(Component message) {
@@ -40,26 +45,20 @@ public class BingoTeam {
 
     public boolean addMember(Player player) {
         final BingoPlayer bingoPlayer = new BingoPlayer(player);
+        return addMember(bingoPlayer);
+    }
 
-        if (this.members.contains(bingoPlayer)) return false;
-
+    public boolean addMember(BingoPlayer bingoPlayer) {
         final LangConfig lang = this.plugin.getLangConfig();
-
+        if (this.members.contains(bingoPlayer)) return false;
         this.members.add(bingoPlayer);
-        this.bingoGame.addPlayer(bingoPlayer);
         bingoPlayer.setTeam(this);
-        sendMessage(TextBuilder.info(lang.team("player_join")));
-
         return true;
     }
 
     public boolean removeMember(BingoPlayer bingoPlayer) {
         if (this.members.remove(bingoPlayer)) {
             final LangConfig lang = this.plugin.getLangConfig();
-
-            if (!this.bingoGame.isStarted()) {
-                this.bingoGame.removePlayer(bingoPlayer);
-            }
 
             bingoPlayer.setTeam(null);
             sendMessage(TextBuilder.info(lang.team("player_leave")));
@@ -102,6 +101,38 @@ public class BingoTeam {
     }
 
     public void setOwner(BingoPlayer owner) {
+        final LangConfig lang = this.plugin.getLangConfig();
         this.owner = owner;
+        owner.getPlayer().sendMessage(TextBuilder.info(lang.team("new_team_owner")));
+    }
+
+    public boolean isOwner(BingoPlayer bingoPlayer) {
+        return bingoPlayer.equals(this.owner);
+    }
+
+    public void setRandomOwner() {
+        BingoPlayer newOwner = this.members.get(new Random().nextInt(this.members.size()));
+        setOwner(newOwner);
+    }
+
+    public static TextColor randomColor() {
+        List<TextColor> colors = List.of(
+                NamedTextColor.BLACK, NamedTextColor.DARK_BLUE, NamedTextColor.DARK_GREEN, NamedTextColor.DARK_AQUA,
+                NamedTextColor.DARK_RED, NamedTextColor.DARK_PURPLE, NamedTextColor.GOLD, NamedTextColor.GRAY,
+                NamedTextColor.DARK_GRAY, NamedTextColor.BLUE, NamedTextColor.GREEN, NamedTextColor.AQUA,
+                NamedTextColor.RED, NamedTextColor.LIGHT_PURPLE, NamedTextColor.YELLOW, NamedTextColor.WHITE);
+        return colors.get(new Random().nextInt(colors.size()));
+    }
+    public static String randomPrefix() {
+        List<Character> chars = List.of(
+                'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+                'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+                '0','1','2','3','4','5','6','7','8','9');
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            char c = chars.get(new Random().nextInt(chars.size()));
+            builder.append(c);
+        }
+        return builder.toString();
     }
 }

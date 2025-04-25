@@ -11,3 +11,6 @@ spawn-max-distance: 32
 spectator-team-name: "bingo_spectator"
 # This stores the last seed played, if the game starts and no card has been generated, this seed will be used instead
 last-bingo-seed-played:
+# This stores the default team name that randomly generated teams will have
+# (Variables %number% - Counter of the amount of teams created)
+default-team-name: "team%number%"

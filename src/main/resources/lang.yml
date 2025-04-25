@@ -66,11 +66,33 @@ bingo:
       item_name: "<light_purple>Bingo Card!"
       description: "<gray>Right Click to see your Bingo Card!"
   team:
+    # Format of the Team Chat messages
+    # (Varaibles: %team_prefix% - Team prefix of the team. %player% - Player sending the message. %message% Message sent by player)
     message: "[%team_prefix%] %player% <gray>>></gray> %message%"
+    # Message when a player joins the team
+    # (Variables: %player% - Player that joined the team)
     player_join: "%player% joined your team"
+    # Message when a player leaves the team
+    # (Variables: %player% - Player that left the team)
     player_leave: "%player% left the team"
+    # Message when a player sends an Invitation.
+    # (Variables: %player% - Player that will receive the invitation)
+    invitation_sent: "Invitation sent to %player%"
+    # Message when the player receives an Invitation.
+    # (Variables: %player% - Player who sent the invitation)
+    received_invitation: "You received an Invitation from %player%"
+    # Chat button display where the player clicks to join the tem from the invitation!
+    accept_invitation_button: "<green><b>[ACCEPT]"
+    # Message when a Team Invitation expires
+    # (Variables: %player% - Player that sent the invitation)
+    invitation_expired: "<gray>The invitation from %player% has expired!"
+    # Message when a team is created
+    team_created: "Your team has been created successfully"
+    # Message when the Team Owner is reassigned
+    new_team_owner: "<yellow>You are the new team owner"
+
   error:
-    # When a player tries to open the Bingo Card item, bute there´s no bingo card yet
+    # When a player tries to open the Bingo Card item, but there´s no bingo card yet
     cant_open_bingo_card: "You can´t open your Bingo Card if it´s not generated!"
     # When the generation of the Bingo Card failed.
     failed_card_generation: "Couldn´t generate new bingo card! It´s using a valid seed?"
@@ -86,6 +108,16 @@ bingo:
     player_does_not_exist: "That player does´t exist or isn´t connected to the server!"
     # When calling a Player that isn´t playing the Game
     player_not_in_game: "That player is playing the game!"
+    # When doing /bingoteam accept from a player without team.
+    team_doesnt_exist: "That team no longer exists!"
+    # When doing /bingoteam accept without any pending invite
+    no_pending_invites: "You don´t have any pending invites"
+    # When player tries to rejoin his own team.
+    already_in_that_team: "You already are on this team!"
+    # When a player tries to invite someone without being on a team.
+    player_not_in_a_team: "You are not in a team!"
+    # When introducing and invalid color code while creating a team
+    malformed_color_string: "Introduced color has a wrong format. Use hexadecimal format (Example: #FF0000 for Red)"
   help:
     # List of the contents tha will display the /bingo help command
     # /bingo generate advice

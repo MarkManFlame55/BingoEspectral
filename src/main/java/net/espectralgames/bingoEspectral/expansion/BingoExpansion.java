@@ -40,9 +40,9 @@ public class BingoExpansion extends PlaceholderExpansion {
         if (bingoPlayer == null) return "";
 
         return switch (params) {
-            //case "team_name" -> bingoPlayer.getPlayer().getName();
-            //case "team_prefix" -> bingoPlayer.getTeam() == null ? "" : bingoPlayer.getTeam().getPrefix();
-            //case "team_color" -> bingoPlayer.getTeam() == null ? "" : "&" + bingoPlayer.getTeam().getColor().asHexString();
+            case "team_name" -> bingoPlayer.getPlayer().getName();
+            case "team_prefix" -> bingoPlayer.getTeam() == null ? "" : bingoPlayer.getTeam().getPrefix();
+            case "team_color" -> bingoPlayer.getTeam() == null ? "" : "&" + bingoPlayer.getTeam().getColor().asHexString();
             default -> "";
         };
     }

@@ -39,7 +39,7 @@ public class bingocardCommand implements TabExecutor {
             if (bingoPlayer != null) {
                 if (bingoPlayer.getPersonalCard() != null) {
                     player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);
-                    new BingoCardMenu(bingoPlayer.getPersonalCard()).open(player);
+                    new BingoCardMenu(bingoPlayer.getPersonalCard(), bingoPlayer).open(player);
                 } else {
                     player.sendMessage(TextBuilder.error(lang.error(ErrorMessage.CANT_OPEN_BINGO_CARD)));
                 }
