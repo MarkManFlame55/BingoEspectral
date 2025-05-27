@@ -13,7 +13,7 @@ public class BingoOptions {
     private boolean keepInventory = false;
     private boolean displayTime = true;
     private int maxTime = 3600;
-    private int pointePerItem = 1;
+    private int pointsPerItem = 1;
     private int pointsPerBingo = 5;
     private int teamSize = 1;
     private boolean randomTeams = true;
@@ -106,12 +106,12 @@ public class BingoOptions {
         this.displayTime = displayTime;
     }
 
-    public int getPointePerItem() {
-        return pointePerItem;
+    public int getPointsPerItem() {
+        return pointsPerItem;
     }
 
-    public void setPointePerItem(int pointePerItem) {
-        this.pointePerItem = pointePerItem;
+    public void setPointsPerItem(int pointsPerItem) {
+        this.pointsPerItem = pointsPerItem;
     }
 
     public int getPointsPerBingo() {

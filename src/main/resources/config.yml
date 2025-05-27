@@ -3,7 +3,7 @@
 # Developed for EspectralGames
 #
 
-#
+# Max distance that players can be randomly teleported at game start.
 spread-distance: 2000
 # The maximun distance the players can go away while waiting to start
 spawn-max-distance: 32
@@ -14,3 +14,7 @@ last-bingo-seed-played:
 # This stores the default team name that randomly generated teams will have
 # (Variables %number% - Counter of the amount of teams created)
 default-team-name: "team%number%"
+# Points given to the team when a player finds an item.
+item-found-points: 1
+# Points given to the team when they achieve a Bingo.
+bingo-found-points: 5

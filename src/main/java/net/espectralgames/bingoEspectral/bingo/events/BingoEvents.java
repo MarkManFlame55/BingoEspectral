@@ -4,6 +4,7 @@ import net.espectralgames.bingoEspectral.BingoEspectral;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.BingoPlayer;
 import net.espectralgames.bingoEspectral.bingo.options.BingoType;
+import net.espectralgames.bingoEspectral.bingo.team.BingoTeam;
 import net.espectralgames.bingoEspectral.item.BingoCardItem;
 import net.espectralgames.bingoEspectral.ui.Menu;
 import net.espectralgames.bingoEspectral.utils.LangConfig;
@@ -21,6 +22,8 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BingoEvents implements Listener {
 
@@ -45,6 +48,12 @@ public class BingoEvents implements Listener {
                 }
 
                 if (bingoPlayer.getPersonalCard().discardItem(material)) {
+                    BingoTeam bingoTeam = bingoPlayer.getTeam();
+
+                    for (BingoPlayer teammate : bingoTeam.getMembers()) {
+                        teammate.getPersonalCard().discardItem(material);
+                    }
+
                     if (this.bingoGame.getOptions().isRemoveMarkedItems()) {
                         e.setCancelled(true);
                         e.getItem().remove();
@@ -76,6 +85,11 @@ public class BingoEvents implements Listener {
                 if (itemStack != null && !itemStack.isSimilar(BingoCardItem.item())) {
                     final Material material = itemStack.getType();
                     if (bingoPlayer.getPersonalCard().discardItem(material)) {
+                        BingoTeam bingoTeam = bingoPlayer.getTeam();
+                        for (BingoPlayer teammate : bingoTeam.getMembers()) {
+                            teammate.getPersonalCard().discardItem(material);
+                        }
+
                         if (this.bingoGame.getOptions().isRemoveMarkedItems()) {
                             itemStack.subtract();
                             if (e.getClickedInventory() instanceof CraftingInventory craftingInventory) {
@@ -101,10 +115,12 @@ public class BingoEvents implements Listener {
             p.sendMessage(TextBuilder.success(lang.game("item_found").replace("%player%", player.getName()).replace("%item%", "<lang:" + material.getItemTranslationKey() + ">")));
             p.playSound(p, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.AMBIENT, 1.0f, 1.0f);
         }
-        bingoPlayer.addPoints(this.bingoGame.getOptions().getPointePerItem());
+        bingoPlayer.addPoints(this.bingoGame.getOptions().getPointsPerItem());
         if (this.bingoGame.getOptions().isFullCard()) {
 
-            if (bingoPlayer.getPersonalCard().hasBingo(BingoType.ALL)) {
+            List<String> nuevasLineas = bingoPlayer.getPersonalCard().getNewCompletedLines();
+
+            if (!nuevasLineas.isEmpty()) {
                 for (Player p : server.getOnlinePlayers()) {
                     p.sendMessage(TextBuilder.success(lang.game("bingo_scored").replace("%player%", player.getName())));
                     p.playSound(p, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.AMBIENT, 1.0f, 1.0f);
@@ -113,12 +129,12 @@ public class BingoEvents implements Listener {
             }
 
             if (bingoPlayer.getPersonalCard().isCompleted()) {
-                this.bingoGame.finishGame(bingoPlayer);
+                this.bingoGame.finishGame(bingoPlayer.getTeam());
             }
         } else {
             if (bingoPlayer.getPersonalCard().hasBingo(this.bingoGame.getOptions().getType())) {
                 bingoPlayer.addPoints(this.bingoGame.getOptions().getPointsPerBingo());
-                this.bingoGame.finishGame(bingoPlayer);
+                this.bingoGame.finishGame(bingoPlayer.getTeam());
             }
         }
 

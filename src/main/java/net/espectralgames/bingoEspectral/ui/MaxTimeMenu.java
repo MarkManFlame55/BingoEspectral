@@ -26,43 +26,43 @@ public class MaxTimeMenu extends SimpleMenu {
             setItem(i, empty());
         }
 
-        setItem(10, simpleMenuItem(Material.BLUE_CONCRETE, "<blue>15min"), player -> {
+        setItem(10, simpleMenuItem(Material.BLUE_CONCRETE, "<blue>15min"), (player, clickType) -> {
             this.bingoGame.getOptions().setMaxTime(minutes(15));
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f ,1.0f);
             new BingoOptionsMenu().open(player);
         });
 
-        setItem(11, simpleMenuItem(Material.LIGHT_BLUE_CONCRETE, "<aqua>30min"), player -> {
+        setItem(11, simpleMenuItem(Material.LIGHT_BLUE_CONCRETE, "<aqua>30min"), (player, clickType) -> {
             this.bingoGame.getOptions().setMaxTime(minutes(30));
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f ,1.0f);
             new BingoOptionsMenu().open(player);
         });
 
-        setItem(12, simpleMenuItem(Material.LIME_CONCRETE, "<green>1h"), player -> {
+        setItem(12, simpleMenuItem(Material.LIME_CONCRETE, "<green>1h"), (player, clickType) -> {
             this.bingoGame.getOptions().setMaxTime(hours(1));
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f ,1.0f);
             new BingoOptionsMenu().open(player);
         });
 
-        setItem(13, simpleMenuItem(Material.YELLOW_CONCRETE, "<yellow>1h30min"), player -> {
+        setItem(13, simpleMenuItem(Material.YELLOW_CONCRETE, "<yellow>1h30min"), (player, clickType) -> {
             this.bingoGame.getOptions().setMaxTime(hours(1) + minutes(30));
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f ,1.0f);
             new BingoOptionsMenu().open(player);
         });
 
-        setItem(14, simpleMenuItem(Material.ORANGE_CONCRETE, "<gold>2h"), player -> {
+        setItem(14, simpleMenuItem(Material.ORANGE_CONCRETE, "<gold>2h"), (player, clickType) -> {
             this.bingoGame.getOptions().setMaxTime(hours(2));
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f ,1.0f);
             new BingoOptionsMenu().open(player);
         });
 
-        setItem(15, simpleMenuItem(Material.RED_CONCRETE, "<red>2h30min"), player -> {
+        setItem(15, simpleMenuItem(Material.RED_CONCRETE, "<red>2h30min"), (player, clickType) -> {
             this.bingoGame.getOptions().setMaxTime(hours(2) + minutes(30));
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f ,1.0f);
             new BingoOptionsMenu().open(player);
         });
 
-        setItem(16, simpleMenuItem(Material.GRAY_CONCRETE, "<dark_red>3h"), player -> {
+        setItem(16, simpleMenuItem(Material.GRAY_CONCRETE, "<dark_red>3h"), (player, clickType) -> {
             this.bingoGame.getOptions().setMaxTime(hours(3));
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f ,1.0f);
             new BingoOptionsMenu().open(player);

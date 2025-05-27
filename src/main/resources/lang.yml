@@ -27,8 +27,12 @@ bingo:
     keep_inventory: "<green>Keep Inventory:"
     delete_items: "<dark_red>Delete items when marked:"
     full_card: "<dark_green>Full Card:"
+    random_teams: "<aqua>Random Teams:"
+    team_size: "<blue>Teams Size:"
     # Description for buttons that open other inventories
     click_to_open: "<dark_gray>Click to open"
+    # Name of the Top Points Item on the Bingo Card
+    points_top: "<gold><b>Top Points"
   game:
     # When a player founds an item of its card.
     # (Variables: %player% - Player obtaining the item, %item% - The item obtained)
@@ -49,18 +53,20 @@ bingo:
     # (Variables: %h% - Hours played, %m% - Minutes in the hour, %s% - Seconds in the minute)
     total_game_time: "<gold>Time Played: <aqua>%h%:%m%:%s%"
     # Message displaying the amount of items the winner has found
-    # (Variables: %player% - Player that won the game, %count% - Number of items found by the player)
-    player_won_points: "<b><light_purple> %player%</b><white> won with %count% points!"
+    # (Variables: %team% - Team that won the game, %count% - Number of items found by the player)
+    player_won_points: "<b><light_purple> %team%</b><white> won with %count% points!"
     # When a player has died on hardcore mode
     disqualified: "<red>You died and lost the game! :("
     # When a player scores a Bingo in Full Card mode
     # (Variables: %player% - Player that scored the Bingo)
     bingo_scored: "%player% has scored <gold>Bingo!"
+    # Title of the message showing the Top Points Teams
+    top_points_title: "<gold><b>Top Points:"
     # End of game title.
-    # Variables: %player% - Player that won the game.
+    # Variables: %team% - Team that won the game.
     win:
       title: "<light_purple>Game Ended!"
-      subtitle: "<gold><b>%player%</b><white> won!"
+      subtitle: "<gold><b>%team%</b><white> won!"
     # Name and description of the Bingo Card item.
     bingo_card_item:
       item_name: "<light_purple>Bingo Card!"
@@ -68,7 +74,7 @@ bingo:
   team:
     # Format of the Team Chat messages
     # (Varaibles: %team_prefix% - Team prefix of the team. %player% - Player sending the message. %message% Message sent by player)
-    message: "[%team_prefix%] %player% <gray>>></gray> %message%"
+    message: "[%team_prefix%] %player% <gray>>></gray> <white>%message%"
     # Message when a player joins the team
     # (Variables: %player% - Player that joined the team)
     player_join: "%player% joined your team"
@@ -83,6 +89,8 @@ bingo:
     received_invitation: "You received an Invitation from %player%"
     # Chat button display where the player clicks to join the tem from the invitation!
     accept_invitation_button: "<green><b>[ACCEPT]"
+    # Message when hovering over the accept invitation button
+    accept_invitation_button_hover: "<gradient:dark_green:green>Click to join the team!"
     # Message when a Team Invitation expires
     # (Variables: %player% - Player that sent the invitation)
     invitation_expired: "<gray>The invitation from %player% has expired!"
@@ -90,7 +98,30 @@ bingo:
     team_created: "Your team has been created successfully"
     # Message when the Team Owner is reassigned
     new_team_owner: "<yellow>You are the new team owner"
-
+    # Message when the Player toggles its chat to be in GLOBAL
+    global_chat_set: "<gray>You are now chatting in <red>GLOBAL"
+    # Message when the Player toggles its chat to be in TEAM
+    team_chat_set: "<gray>You are now chatting in <green>TEAM"
+    # Message when the team get renamed.
+    # (Variables: %name% - New team name)
+    team_renamed: "Team successfully renamed to %name%"
+    # Message when the team get recolored.
+    # (Variables: %color% - New team color)
+    team_recolored: "Team color changed to %color%"
+    # Message when the team prefix gets changed.
+    # (Variables: %prefix% - New team name)
+    team_new_prefix: "Team prefix changed to %prefix%"
+  score:
+    # Title of the Scoreboard
+    score_title: "<gradient:aqua:blue>BingoEspectral"
+    # Player display
+    player_name_title: "<aqua>Player:"
+    # Team display
+    team_title: "<aqua>Team:"
+    # Points Display
+    points_title: "<aqua>Your Points:"
+    # Last line of the scoreboard, usually used for the server IP.
+    server_ip_title: "bingo.yourserver.net"
   error:
     # When a player tries to open the Bingo Card item, but there´s no bingo card yet
     cant_open_bingo_card: "You can´t open your Bingo Card if it´s not generated!"
@@ -108,6 +139,8 @@ bingo:
     player_does_not_exist: "That player does´t exist or isn´t connected to the server!"
     # When calling a Player that isn´t playing the Game
     player_not_in_game: "That player is playing the game!"
+    # When trying to add a player to the game when its already playing
+    player_already_in_game: "That player is playing already"
     # When doing /bingoteam accept from a player without team.
     team_doesnt_exist: "That team no longer exists!"
     # When doing /bingoteam accept without any pending invite
@@ -118,6 +151,14 @@ bingo:
     player_not_in_a_team: "You are not in a team!"
     # When introducing and invalid color code while creating a team
     malformed_color_string: "Introduced color has a wrong format. Use hexadecimal format (Example: #FF0000 for Red)"
+    # When a player that is not the team owner tries to modify a team property
+    only_owner_allowed: "Only the team owner can change that!"
+    # When a player tries to do something invalid on itself
+    prevented_self_action: "You can´t do that to yourself!"
+    # When trying something that requires the game to be started
+    game_hasnt_started: "The game didn´t started yet"
+    # When trying something that requires game to not be started
+    game_already_started: "The game has already been started"
   help:
     # List of the contents tha will display the /bingo help command
     # /bingo generate advice
@@ -134,11 +175,43 @@ bingo:
     stop: "Forces the end of the game"
     # /bingo reload advice
     reload: "Reload the bingo config (cards.yml, lang.yml, config.yml)"
+    # /bingo ls advice
+    ls: "Add a player during the game, in case they came late"
+    # /bingo clearteams advice
+    clearteams: "Clears all created teams"
+    # /bingo points advice
+    points:
+      # /bingo points add advice
+      add: "Add points to a player"
+      # /bingo points set advice
+      set: "Overrides player´s points with the ones specified"
+      # /bingo points get advice
+      get: "Show points of a player´s team"
+      # /bingo points top advice
+      top: "Show the top points teams"
     # /bingocard advice
     bingocard: "Shows the your personal card if you are playing"
     # /bingo help advice
     help: "Show this list"
+    bingoteam:
+      # /bingoteam accept advice
+      accept: "Accept the last invitation recieved"
+      # /bingoteam create advice
+      create: "Creates a new team where you are the owner"
+      # /bingoteam invite advice
+      invite: "Invite a player to your team"
+      # /bingoteam leave advice
+      leave: "Leave the team you are currently in"
+      # /bingoteam modify advice
+      modify: "Modify your team visuals"
+      # /bingoteam remove advice
+      remove: "Kick a player from your team"
+      # /bingoteam list advice
+      list: "Show all players on your team"
+      # /bingoteam togglechat advice
+      togglechat: "Toggle between Team Chat and Global Chat"
+      # /bingoteam help advice
+      help: "Show this list"
   config:
     # Message shown to the sender of the /bingo reload command
-
     reload: "Config Reloaded!"

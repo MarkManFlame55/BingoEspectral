@@ -20,8 +20,7 @@ public class MenuListeners implements Listener {
         if (!(clickedInv.getHolder() instanceof final Menu menu)) {
             return;
         }
-
         e.setCancelled(true);
-        menu.click((Player) e.getWhoClicked(), e.getSlot());
+        menu.click((Player) e.getWhoClicked(), e.getSlot(), e.getClick());
     }
 }

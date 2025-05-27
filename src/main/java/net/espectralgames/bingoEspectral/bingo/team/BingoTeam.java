@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class BingoTeam {
@@ -19,6 +20,7 @@ public class BingoTeam {
     private final BingoEspectral plugin = BingoEspectral.getPlugin();
     private final BingoGame bingoGame = this.plugin.getBingoGame();
 
+    private final int MAX_PREFIX_LENGTH = 12;
     private BingoPlayer owner;
     private final List<BingoPlayer> members;
     private String prefix;
@@ -26,11 +28,11 @@ public class BingoTeam {
     private String teamName;
 
     public BingoTeam(BingoPlayer owner, String teamName, String prefix, TextColor color) {
-        this.owner = owner;
         this.teamName = teamName;
-        this.prefix = prefix;
+        this.setPrefix(prefix);
         this.color = color;
         this.members = new ArrayList<>();
+        this.setOwner(owner);
     }
     public BingoTeam() {
         this.members = new ArrayList<>();
@@ -49,7 +51,6 @@ public class BingoTeam {
     }
 
     public boolean addMember(BingoPlayer bingoPlayer) {
-        final LangConfig lang = this.plugin.getLangConfig();
         if (this.members.contains(bingoPlayer)) return false;
         this.members.add(bingoPlayer);
         bingoPlayer.setTeam(this);
@@ -58,10 +59,8 @@ public class BingoTeam {
 
     public boolean removeMember(BingoPlayer bingoPlayer) {
         if (this.members.remove(bingoPlayer)) {
-            final LangConfig lang = this.plugin.getLangConfig();
-
+            if (isOwner(bingoPlayer)) setRandomOwner();
             bingoPlayer.setTeam(null);
-            sendMessage(TextBuilder.info(lang.team("player_leave")));
             return true;
         }
         return false;
@@ -77,7 +76,12 @@ public class BingoTeam {
     }
 
     public void setPrefix(String prefix) {
-        this.prefix = prefix;
+        if (prefix.length() <= this.MAX_PREFIX_LENGTH) {
+            this.prefix = prefix;
+        } else {
+            this.prefix = prefix.substring(0, MAX_PREFIX_LENGTH);
+        }
+
     }
 
     public TextColor getColor() {
@@ -103,6 +107,7 @@ public class BingoTeam {
     public void setOwner(BingoPlayer owner) {
         final LangConfig lang = this.plugin.getLangConfig();
         this.owner = owner;
+        addMember(owner);
         owner.getPlayer().sendMessage(TextBuilder.info(lang.team("new_team_owner")));
     }
 
@@ -111,8 +116,30 @@ public class BingoTeam {
     }
 
     public void setRandomOwner() {
-        BingoPlayer newOwner = this.members.get(new Random().nextInt(this.members.size()));
-        setOwner(newOwner);
+        if (!this.members.isEmpty()) {
+            BingoPlayer newOwner = this.members.get(new Random().nextInt(this.members.size()));
+            setOwner(newOwner);
+        }
+    }
+
+    public int getTeamPoints() {
+        int points = 0;
+        for (BingoPlayer bingoPlayer : this.members) {
+            points += bingoPlayer.getPoints();
+        }
+        return points;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BingoTeam bingoTeam)) return false;
+        return Objects.equals(plugin, bingoTeam.plugin) && Objects.equals(bingoGame, bingoTeam.bingoGame) && Objects.equals(owner, bingoTeam.owner) && Objects.equals(members, bingoTeam.members) && Objects.equals(prefix, bingoTeam.prefix) && Objects.equals(color, bingoTeam.color) && Objects.equals(teamName, bingoTeam.teamName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(plugin, bingoGame, MAX_PREFIX_LENGTH, owner, members, prefix, color, teamName);
     }
 
     public static TextColor randomColor() {

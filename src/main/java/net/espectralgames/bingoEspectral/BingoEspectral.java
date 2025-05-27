@@ -1,11 +1,15 @@
 package net.espectralgames.bingoEspectral;
 
+import io.papermc.paper.plugin.configuration.PluginMeta;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.events.BingoEvents;
+import net.espectralgames.bingoEspectral.bingo.team.TeamChatManager;
 import net.espectralgames.bingoEspectral.commands.bingoCommand;
 import net.espectralgames.bingoEspectral.commands.bingocardCommand;
+import net.espectralgames.bingoEspectral.commands.bingoteamCommand;
 import net.espectralgames.bingoEspectral.expansion.BingoExpansion;
 import net.espectralgames.bingoEspectral.item.BingoCardItem;
+import net.espectralgames.bingoEspectral.ui.boards.BingoGameScore;
 import net.espectralgames.bingoEspectral.ui.listeners.MenuListeners;
 import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
@@ -24,11 +28,12 @@ import java.io.IOException;
 
 public final class BingoEspectral extends JavaPlugin {
 
+
     private static BingoEspectral plugin;
     private BingoGame bingoGame;
     private File cardsFile, langFile;
     private YamlConfiguration cardsConfig = new YamlConfiguration();
-    private LangConfig langConfig = new LangConfig();
+    private LangConfig langConfig;
     private BingoExpansion expansion;
 
 
@@ -36,7 +41,8 @@ public final class BingoEspectral extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         bingoGame = new BingoGame();
-        //expansion.register();
+        expansion = new BingoExpansion();
+        expansion.register();
 
         saveDefaultConfig();
 
@@ -46,21 +52,23 @@ public final class BingoEspectral extends JavaPlugin {
 
         getCommand("bingo").setExecutor(new bingoCommand());
         getCommand("bingocard").setExecutor(new bingocardCommand());
+        getCommand("bingoteam").setExecutor(new bingoteamCommand());
 
         getServer().getPluginManager().registerEvents(new BingoEvents(), this);
         getServer().getPluginManager().registerEvents(new MenuListeners(), this);
         getServer().getPluginManager().registerEvents(new BingoCardItem(), this);
+        getServer().getPluginManager().registerEvents(new TeamChatManager(), this);
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (bingoGame.isWaitingToStart()) {
-                    bingoGame.waitingSequence();
+                    bingoGame.waitingSequence(BingoEspectral.this);
                 }
             }
         }.runTaskTimer(this, 0, 20);
 
-        //Bukkit.getScheduler().runTaskTimer(this, new BingoGameScore(), 0, 20);
+        new BingoGameScore().runTaskTimer(this, 0, 20);
     }
 
     @Override
@@ -93,7 +101,7 @@ public final class BingoEspectral extends JavaPlugin {
         try {
             cardsConfig.load(cardsFile);
             this.getLogger().info("cards.yml configuration loaded!");
-            langConfig.load(langFile);
+            langConfig = new LangConfig(langFile);
             this.getComponentLogger().info("lang.yml configuration loaded!");
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
@@ -133,7 +141,7 @@ public final class BingoEspectral extends JavaPlugin {
     }
 
     public void reloadLangConfig() {
-        this.langConfig = (LangConfig) YamlConfiguration.loadConfiguration(langFile);
+        this.langConfig = new LangConfig(langFile);
         this.getLogger().info("lang.yml configuration reloaded!");
     }
 

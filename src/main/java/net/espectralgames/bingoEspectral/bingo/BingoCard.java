@@ -7,12 +7,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class BingoCard {
 
     private final BingoEspectral plugin = BingoEspectral.getPlugin();
+    private final Set<String> completedLines = new HashSet<>();
     private boolean generated = false;
     private String seed = "";
 
@@ -371,5 +371,51 @@ public class BingoCard {
      */
     public void setSeed(String seed) {
         this.seed = seed;
+    }
+
+    public List<String> getNewCompletedLines() {
+        List<String> newLines = new ArrayList<>();
+
+        // Horizontal (filas)
+        for (int row = 0; row < SIZE; row++) {
+            if (isFullRow(bingoCard, row)) {
+                String id = "ROW_" + row;
+                if (!completedLines.contains(id)) {
+                    completedLines.add(id);
+                    newLines.add(id);
+                }
+            }
+        }
+
+        // Vertical (columnas)
+        for (int col = 0; col < SIZE; col++) {
+            if (isFullColumn(bingoCard, col)) {
+                String id = "COL_" + col;
+                if (!completedLines.contains(id)) {
+                    completedLines.add(id);
+                    newLines.add(id);
+                }
+            }
+        }
+
+        // Diagonal izquierda a derecha
+        if (isLeftToRightDiagonalFull(bingoCard)) {
+            String id = "DIAG_LR";
+            if (!completedLines.contains(id)) {
+                completedLines.add(id);
+                newLines.add(id);
+            }
+        }
+
+        // Diagonal derecha a izquierda
+        if (isRightToLeftDiagonalFull(bingoCard)) {
+            String id = "DIAG_RL";
+            if (!completedLines.contains(id)) {
+                completedLines.add(id);
+                newLines.add(id);
+            }
+        }
+
+        return newLines;
     }
 }

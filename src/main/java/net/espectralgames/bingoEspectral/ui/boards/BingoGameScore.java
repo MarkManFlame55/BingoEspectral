@@ -25,32 +25,50 @@ public class BingoGameScore extends BukkitRunnable {
         final BingoPlayer bingoPlayer = this.bingoGame.getPlayer(player);
         if (bingoPlayer == null) return;
         final Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        final Objective objective = scoreboard.registerNewObjective(OBJECTIVE_NAME, Criteria.DUMMY, TextBuilder.minimessage("<gradient:aqua:blue><b>BingoEspectral"), RenderType.INTEGER);
+        final Objective objective = scoreboard.registerNewObjective(OBJECTIVE_NAME, Criteria.DUMMY, TextBuilder.minimessage(lang.score("score_title")), RenderType.INTEGER);
         objective.numberFormat(NumberFormat.blank());
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        createScore("blank1", Component.text(""), 20, objective);
-        createScore("playerNameTitle", TextBuilder.minimessage("<aqua>Player:"), 19, objective);
-        createScore("playerName", TextBuilder.minimessage("<gray>> <white>" + player.getName()), 18, objective);
-        createScore("blank2", Component.text(""), 17, objective);
-        createScore("pointsTitle", TextBuilder.minimessage("<aqua>Your Points:"), 16, objective);
-        createScore("playerPoints", TextBuilder.minimessage("<gray>> <white>" + bingoPlayer.getPoints()), 15, objective);
-        createScore("blank3", Component.text(""), 14, objective);
-        createScore("serverIP", TextBuilder.minimessage("<aqua>uhc.espectral.es"), 13, objective);
+        createScore("blank1", Component.text(""), 10, objective);
+        createScore("playerNameTitle", TextBuilder.minimessage(lang.score("player_name_title")), 9, objective);
+        createScore("playerName", TextBuilder.minimessage(player.getName()), 8, objective);
+        createScore("blank2", Component.text(""), 7, objective);
+        createScore("teamNameTitle", TextBuilder.minimessage(lang.score("team_title")), 6, objective);
+        createScore("teamName", TextBuilder.minimessage(bingoPlayer.getTeam().getTeamName()).color(bingoPlayer.getTeam().getColor()), 5, objective);
+        createScore("blank4", Component.text(""), 4, objective);
+        createScore("pointsTitle", TextBuilder.minimessage(lang.score("points_title")), 3, objective);
+        createScore("playerPoints", TextBuilder.minimessage("" + bingoPlayer.getPoints()), 2, objective);
+        createScore("blank3", Component.text(""), 1, objective);
+        createScore("serverIP", TextBuilder.minimessage(lang.score("server_ip_title")), 0, objective);
 
         player.setScoreboard(scoreboard);
     }
 
     private void updateScoreboard(Player player) {
+        final LangConfig lang = this.plugin.getLangConfig();
         Scoreboard scoreboard = player.getScoreboard();
         Objective objective = scoreboard.getObjective(OBJECTIVE_NAME);
         Preconditions.checkNotNull(objective);
         BingoPlayer bingoPlayer = this.plugin.getBingoGame().getPlayer(player);
-        modifyCustomName("playerPoints", TextBuilder.minimessage("<white>" + bingoPlayer.getPoints()), objective);
+
+        objective.displayName(TextBuilder.minimessage(lang.score("score_title")));
+        modifyCustomName("playerNameTitle", TextBuilder.minimessage(lang.score("player_name_title")), objective);
+        modifyCustomName("teamNameTitle", TextBuilder.minimessage(lang.score("team_title")), objective );
+        modifyCustomName("pointsTitle", TextBuilder.minimessage(lang.score("points_title")), objective);
+        modifyCustomName("serverIP", TextBuilder.minimessage(lang.score("server_ip_title")), objective);
+        modifyCustomName("playerPoints", TextBuilder.minimessage("" + bingoPlayer.getTeam().getTeamPoints()), objective);
+        modifyCustomName("teamName",TextBuilder.minimessage(bingoPlayer.getTeam().getTeamName()).color(bingoPlayer.getTeam().getColor()), objective);
     }
 
     @Override
     public void run() {
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (this.bingoGame.getPlayer(player) == null) {
+                player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+            }
+        }
+
         for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
             final Player player = bingoPlayer.getPlayer();
             if (player.getScoreboard().getObjective(OBJECTIVE_NAME) != null) {

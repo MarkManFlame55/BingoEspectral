@@ -4,6 +4,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.espectralgames.bingoEspectral.BingoEspectral;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 public class BingoExpansion extends PlaceholderExpansion {
 
     private final BingoEspectral plugin = BingoEspectral.getPlugin();
-    private final BingoGame bingoGame = this.plugin.getBingoGame();
 
     @Override
     public @NotNull String getIdentifier() {
@@ -35,13 +35,13 @@ public class BingoExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        final var bingoPlayer = this.bingoGame.getPlayer(player.getPlayer());
+        final var bingoPlayer = this.plugin.getBingoGame().getTeamManager().getPlayer((Player) player);
 
         if (bingoPlayer == null) return "";
 
         return switch (params) {
             case "team_name" -> bingoPlayer.getPlayer().getName();
-            case "team_prefix" -> bingoPlayer.getTeam() == null ? "" : bingoPlayer.getTeam().getPrefix();
+            case "team_prefix" -> bingoPlayer.getTeam() == null ? "" : "[" + bingoPlayer.getTeam().getPrefix() + "] ";
             case "team_color" -> bingoPlayer.getTeam() == null ? "" : "&" + bingoPlayer.getTeam().getColor().asHexString();
             default -> "";
         };

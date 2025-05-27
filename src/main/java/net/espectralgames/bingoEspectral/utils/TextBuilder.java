@@ -24,7 +24,7 @@ public class TextBuilder {
         return preffix().append(minimessage("<reset><red> " + msg));
     }
     private static Component preffix() {
-        YamlConfiguration lang = plugin.getLangConfig();
+        final LangConfig lang = plugin.getLangConfig();
         return minimessage(lang.getString("bingo.prefix"));
     }
 }

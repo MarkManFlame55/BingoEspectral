@@ -5,6 +5,7 @@ import net.espectralgames.bingoEspectral.bingo.BingoBox;
 import net.espectralgames.bingoEspectral.bingo.BingoCard;
 import net.espectralgames.bingoEspectral.bingo.BingoGame;
 import net.espectralgames.bingoEspectral.bingo.BingoPlayer;
+import net.espectralgames.bingoEspectral.bingo.team.BingoTeam;
 import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
 import net.kyori.adventure.text.Component;
@@ -51,6 +52,8 @@ public class BingoCardMenu extends SimpleMenu {
         for (int i = 0; i < getInventory().getSize(); i++) {
             setItem(i, empty());
         }
+
+        setItem(0, topTeams());
 
         for (int i = 2; i < 7; i++) {
             BingoBox element = this.bingoCard.getElementAt(i-2, 0);
@@ -103,29 +106,33 @@ public class BingoCardMenu extends SimpleMenu {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.displayName(MiniMessage.miniMessage().deserialize("<green><lang:" + material.getItemTranslationKey() + ">").decoration(TextDecoration.ITALIC, false));
         itemMeta.setEnchantmentGlintOverride(true);
-        final List<String> playerWithItem = new ArrayList<>();
+        final List<BingoTeam> teamWithItem = new ArrayList<>();
         final List<Component> lore = new ArrayList<>();
 
         if (this.player == null) {
             for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
                 if (bingoPlayer.getPersonalCard().isMarked(material)) {
-                    playerWithItem.add(bingoPlayer.getName());
+                    if (!teamWithItem.contains(bingoPlayer.getTeam())) {
+                        teamWithItem.add(bingoPlayer.getTeam());
+                    }
                 }
             }
         } else {
             for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
                 if (!bingoPlayer.equals(this.player)) {
                     if (bingoPlayer.getPersonalCard().isMarked(material)) {
-                        playerWithItem.add(bingoPlayer.getName());
+                        if (!teamWithItem.contains(bingoPlayer.getTeam())) {
+                            teamWithItem.add(bingoPlayer.getTeam());
+                        }
                     }
                 }
             }
         }
 
-        if (!playerWithItem.isEmpty()) {
+        if (!teamWithItem.isEmpty()) {
             lore.add(TextBuilder.minimessage(lang.ui("found_by")));
-            for (String name : playerWithItem) {
-                lore.add(TextBuilder.minimessage("<white>- <gray>" + name));
+            for (BingoTeam bingoTeam : teamWithItem) {
+                lore.add(TextBuilder.minimessage("<white>- ").append(TextBuilder.minimessage("[" + bingoTeam.getPrefix() + "]").color(bingoTeam.getColor())));
             }
         }
         itemMeta.lore(lore);
@@ -139,30 +146,66 @@ public class BingoCardMenu extends SimpleMenu {
 
         itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
-        final List<String> playerWithItem = new ArrayList<>();
+        final List<BingoTeam> teamWithItem = new ArrayList<>();
         final List<Component> lore = new ArrayList<>();
 
         if (this.player == null) {
             for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
                 if (bingoPlayer.getPersonalCard().isMarked(material)) {
-                    playerWithItem.add(bingoPlayer.getName());
+                    if (!teamWithItem.contains(bingoPlayer.getTeam())) {
+                        teamWithItem.add(bingoPlayer.getTeam());
+                    }
                 }
             }
         } else {
             for (BingoPlayer bingoPlayer : this.bingoGame.getPlayerList()) {
                 if (!bingoPlayer.equals(this.player)) {
                     if (bingoPlayer.getPersonalCard().isMarked(material)) {
-                        playerWithItem.add(bingoPlayer.getName());
+                        if (!teamWithItem.contains(bingoPlayer.getTeam())) {
+                            teamWithItem.add(bingoPlayer.getTeam());
+                        }
                     }
                 }
             }
         }
 
-        if (!playerWithItem.isEmpty()) {
+        if (!teamWithItem.isEmpty()) {
             lore.add(TextBuilder.minimessage(lang.ui("found_by")));
-            for (String name : playerWithItem) {
-                lore.add(TextBuilder.minimessage("<white>- <gray>" + name));
+            for (BingoTeam bingoTeam : teamWithItem) {
+                lore.add(TextBuilder.minimessage("<white>- ").append(TextBuilder.minimessage("[" + bingoTeam.getPrefix() + "]").color(bingoTeam.getColor())));
             }
+        }
+
+        itemMeta.lore(lore);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    private ItemStack topTeams() {
+        ItemStack itemStack = new ItemStack(Material.SUNFLOWER);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.displayName(TextBuilder.minimessage("<gold><b>Top Points"));
+        List<Component> lore = new ArrayList<>();
+        List<BingoTeam> topTeams = this.bingoGame.getTeamManager().getTopPoints();
+        for (int i = 0; i < topTeams.size(); i++) {
+            BingoTeam bingoTeam = topTeams.get(i);
+            Component numberComponent;
+            switch (i) {
+                case 0 -> {
+                    numberComponent = TextBuilder.minimessage("<b><gold>[" + (i + 1) + "º]</b> ");
+                }
+                case 1 -> {
+                    numberComponent = TextBuilder.minimessage("<b><gray>[" + (i + 1) + "º]</b> ");
+                }
+                case 2 -> {
+                    numberComponent = TextBuilder.minimessage("<b><#CD7F32>[" + (i + 1) + "º]</b>");
+                }
+                default -> numberComponent = TextBuilder.minimessage("<b><white>[" + (i + 1) + "º]</b> ");
+            }
+
+            lore.add(numberComponent
+                    .append(TextBuilder.minimessage(bingoTeam.getTeamName()).color(bingoTeam.getColor()))
+                    .append(TextBuilder.minimessage("<white> - <aqua>" + bingoTeam.getTeamPoints())));
         }
 
         itemMeta.lore(lore);

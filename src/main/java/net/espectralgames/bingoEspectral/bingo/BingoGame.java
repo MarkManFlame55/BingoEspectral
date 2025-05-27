@@ -34,6 +34,7 @@ public class BingoGame {
     private final BingoOptions options = new BingoOptions();
     private final BingoCard bingoCard = new BingoCard();
     private final TeamManager teamManager = new TeamManager();
+
     private Team spectatorTeam;
     private boolean started;
     private boolean waitingToStart = true;
@@ -210,48 +211,56 @@ public class BingoGame {
             world.setGameRule(GameRule.KEEP_INVENTORY, this.options.isKeepInventory());
         }
 
-        // Iniciar la partida para todos los jugadores que se han unido al bingo.
-        this.players.forEach(bingoPlayer -> {
-
-            Player player = bingoPlayer.getPlayer();
-
+        this.teamManager.getTeams().forEach(bingoTeam -> {
             // Generar una posicion aleatoria en el mundo, dentro del radio de Spread Distance
             double x = random.nextDouble(-this.options.getSpreadDistance(), this.options.getSpreadDistance());
             double z = random.nextDouble(-this.options.getSpreadDistance(), this.options.getSpreadDistance());
-
-            Location location = new Location(player.getWorld(),
+            World overworld = this.server.getWorlds().getFirst();
+            Location location = new Location(overworld,
                     x,
-                    player.getWorld().getHighestBlockYAt((int) x, (int) z, HeightMap.MOTION_BLOCKING) + 1,
+                    overworld.getHighestBlockYAt((int) x, (int) z, HeightMap.MOTION_BLOCKING) + 1,
                     z);
 
-            // TP, Respawn Point y /clear
-            player.teleport(location);
+            for (BingoPlayer bingoPlayer : bingoTeam.getMembers()) {
+                Player player = bingoPlayer.getPlayer();
 
-            // Unlock recipes
-            server.recipeIterator().forEachRemaining(recipe -> {
-                if (recipe instanceof Keyed keyedRecipe)  {
-                    player.discoverRecipe(keyedRecipe.getKey());
+                // TP, Respawn Point y /clear
+                player.teleport(location);
+
+                // Unlock recipes
+                server.recipeIterator().forEachRemaining(recipe -> {
+                    if (recipe instanceof Keyed keyedRecipe)  {
+                        player.discoverRecipe(keyedRecipe.getKey());
+                    }
+                });
+
+                Block spawnBlock = player.getWorld().getBlockAt(location.clone().add(0,-1, 0));
+                if (spawnBlock.isLiquid()) {
+                    player.getWorld().setBlockData(spawnBlock.getLocation(), Bukkit.createBlockData(Material.BEDROCK));
                 }
-            });
 
-            Block spawnBlock = player.getWorld().getBlockAt(location.clone().add(0,-1, 0));
-            if (spawnBlock.isLiquid()) {
-                player.getWorld().setBlockData(spawnBlock.getLocation(), Bukkit.createBlockData(Material.BEDROCK));
+                player.setRespawnLocation(location, true);
+                player.getInventory().clear();
+
+                // Efectos para que empiecen bien
+                player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255, false, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 10, false, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 300, 255, false, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 200, 255, false, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 200, 255, false, false, false));
+
+                player.setGameMode(GameMode.SURVIVAL);
+                bingoPlayer.setPersonalCard(this.bingoCard.copy());
+                player.give(new ItemStack(Material.OAK_BOAT), BingoCardItem.item());
             }
+        });
 
-            player.setRespawnLocation(location, true);
-            player.getInventory().clear();
 
-            // Efectos para que empiecen bien
-            player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 255, false, false, false));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 10, false, false, false));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 300, 255, false, false, false));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 200, 255, false, false, false));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 200, 255, false, false, false));
 
-            player.setGameMode(GameMode.SURVIVAL);
-            bingoPlayer.setPersonalCard(this.bingoCard.copy());
-            player.give(new ItemStack(Material.OAK_BOAT), BingoCardItem.item());
+        // Iniciar la partida para todos los jugadores que se han unido al bingo.
+        this.players.forEach(bingoPlayer -> {
+
+
         });
 
         this.plugin.getConfig().set("last-bingo-seed-played", this.bingoCard.getSeed());
@@ -268,7 +277,7 @@ public class BingoGame {
         this.started = false;
 
         resetWorldRules();
-
+        this.teamManager.clearTeams();
         for (Player player : server.getOnlinePlayers()) {
             World overworld = server.getWorlds().getFirst();
             Location pos = new Location(overworld, 0.5, overworld.getHighestBlockYAt(0,0)+1, 0.5);
@@ -285,21 +294,11 @@ public class BingoGame {
     /**
      * Finishes the game, setting the winner to the player with most points
      *
-     * @see #finishGame(BingoPlayer)
+     * @see #finishGame(BingoTeam)
      */
     public void finishGameForTime() {
-        BingoPlayer winner = null;
-        int maxMarked = 0;
-
-        for (BingoPlayer player : this.players) {
-            int markedCount = player.getPersonalCard().getMarkedItemCount();
-            if (winner == null || markedCount > maxMarked) {
-                winner = player;
-                maxMarked = markedCount;
-            }
-        }
-
-        finishGame(winner);
+        List<BingoTeam> topPoints = this.teamManager.getTopPoints();
+        finishGame(topPoints.getFirst());
     }
 
     /**
@@ -307,7 +306,7 @@ public class BingoGame {
      *
      * @param winner Winner of the Game
      */
-    public void finishGame(BingoPlayer winner) {
+    public void finishGame(BingoTeam winner) {
         final LangConfig lang = this.plugin.getLangConfig();
         final Server server = Bukkit.getServer();
         this.started = false;
@@ -316,12 +315,35 @@ public class BingoGame {
 
         for (Player player : server.getOnlinePlayers()) {
             player.showTitle(Title.title(
-                    TextBuilder.minimessage(lang.game("win.title").replace("%player%", winner.getPlayer().getName())),
-                    TextBuilder.minimessage(lang.game("win.subtitle").replace("%player%", winner.getPlayer().getName())),
+                    TextBuilder.minimessage(lang.game("win.title").replace("%player%", winner.getTeamName())),
+                    TextBuilder.minimessage(lang.game("win.subtitle").replace("%player%", winner.getTeamName())),
                     Title.Times.times(Duration.ofMillis(1), Duration.ofSeconds(5), Duration.ofMillis(1))));
             player.sendMessage(TextBuilder.info(lang.game("player_won_points")
-                    .replace("%player%", winner.getPlayer().getName())
-                    .replace("%count%", String.valueOf(winner.getPersonalCard().getMarkedItemCount()))));
+                    .replace("%player%", winner.getTeamName())
+                    .replace("%count%", String.valueOf(winner.getTeamPoints()))));
+
+            List<BingoTeam> topTeams = this.getTeamManager().getTopPoints();
+            for (int i = 0; i < topTeams.size(); i++) {
+                BingoTeam bingoTeam = topTeams.get(i);
+                Component numberComponent;
+                switch (i) {
+                    case 0 -> {
+                        numberComponent = TextBuilder.minimessage("<b><gold>[" + (i + 1) + "º]</b> ");
+                    }
+                    case 1 -> {
+                        numberComponent = TextBuilder.minimessage("<b><gray>[" + (i + 1) + "º]</b> ");
+                    }
+                    case 2 -> {
+                        numberComponent = TextBuilder.minimessage("<b><#CD7F32>[" + (i + 1) + "º]</b>");
+                    }
+                    default -> numberComponent = TextBuilder.minimessage("<b><white>[" + (i + 1) + "º]</b> ");
+                }
+
+                player.sendMessage(numberComponent
+                        .append(TextBuilder.minimessage(bingoTeam.getTeamName()).color(bingoTeam.getColor()))
+                        .append(TextBuilder.minimessage("<white> - <aqua>" + bingoTeam.getTeamPoints())));
+            }
+
             player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.AMBIENT, 0.8f, 1.0f);
         }
 
@@ -339,6 +361,7 @@ public class BingoGame {
                     }
                     counter++;
                 } else {
+                    players.clear();
                     for (Player player : server.getOnlinePlayers()) {
                         World overworld = server.getWorlds().getFirst();
                         Location pos = new Location(overworld, 0, overworld.getHighestBlockYAt(0,0, HeightMap.MOTION_BLOCKING)+1, 0);
@@ -355,8 +378,8 @@ public class BingoGame {
     /**
      * Sequence of actions that are repeatedly executing while on Waiting Mode
      */
-    public void waitingSequence() {
-        final LangConfig lang = this.plugin.getLangConfig();
+    public void waitingSequence(BingoEspectral plugin) {
+        final LangConfig lang = plugin.getLangConfig();
         final World overworld = server.getWorlds().getFirst();
         final Location center = new Location(overworld, 0.5, overworld.getHighestBlockYAt(0,0, HeightMap.MOTION_BLOCKING)+1, 0.5);
 
@@ -373,7 +396,7 @@ public class BingoGame {
             player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 60, 255, false, false, false));
             player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, 60, 255, false, false, false));
 
-            if (player.getLocation().distance(center) > this.plugin.getConfig().getInt("spawn-max-distance")) {
+            if (player.getLocation().distance(center) > plugin.getConfig().getInt("spawn-max-distance")) {
                 if (!player.getGameMode().isInvulnerable()) {
                     player.teleport(center);
                     player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 0.1f);

@@ -5,6 +5,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -12,11 +13,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public abstract class SimpleMenu implements Menu {
 
-    private final Map<Integer, Consumer<Player>> actions = new HashMap<>();
+    private final Map<Integer, BiConsumer<Player, ClickType>> actions = new HashMap<>();
     private final Inventory inventory;
 
     public SimpleMenu(Rows rows, String title) {
@@ -25,18 +27,18 @@ public abstract class SimpleMenu implements Menu {
     }
 
     @Override
-    public void click(Player player, int slot) {
-        final Consumer<Player> action = this.actions.get(slot);
-        if (action != null) action.accept(player);
+    public void click(Player player, int slot, ClickType clickType) {
+        final BiConsumer<Player, ClickType> action = this.actions.get(slot);
+        if (action != null) action.accept(player, clickType);
     }
 
     @Override
     public void setItem(int slot, ItemStack itemStack) {
-        setItem(slot, itemStack, player -> {});
+        setItem(slot, itemStack, (player, clickType) -> {});
     }
 
     @Override
-    public void setItem(int slot, ItemStack itemStack, Consumer<Player> action) {
+    public void setItem(int slot, ItemStack itemStack, BiConsumer<Player, ClickType> action) {
         this.actions.put(slot, action);
         getInventory().setItem(slot, itemStack);
     }

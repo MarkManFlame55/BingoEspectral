@@ -35,44 +35,68 @@ public class BingoOptionsMenu extends SimpleMenu {
             setItem(i, empty());
         }
 
-        setItem(10, displayTimeItem(), player -> {
+        setItem(10, displayTimeItem(), (player, click) -> {
             this.game.getOptions().setDisplayTime(!this.game.getOptions().isDisplayTime());
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
             onSetItems();
         });
 
-        setItem(11, timelimitItem(), player -> {
+        setItem(11, timelimitItem(), (player, click) -> {
             this.game.getOptions().setTimeLimit(!this.game.getOptions().isTimeLimit());
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
             onSetItems();
         });
 
-        setItem(12, maxTimeItem(), player -> {
+        setItem(12, maxTimeItem(), (player, click) -> {
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
             new MaxTimeMenu().open(player);
         });
 
-        setItem(13, tipoBingoItem(), player -> {
+        setItem(13, tipoBingoItem(), (player, click) -> {
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
             switch (this.game.getOptions().getType()) {
-                case ALL -> this.game.getOptions().setType(BingoType.HORIZONTAL);
-                case HORIZONTAL -> this.game.getOptions().setType(BingoType.VERTICAL);
-                case VERTICAL -> this.game.getOptions().setType(BingoType.DIAGONAL);
-                case DIAGONAL -> this.game.getOptions().setType(BingoType.ALL);
+                case ALL -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setType(BingoType.HORIZONTAL);
+                    } else {
+                        this.game.getOptions().setType(BingoType.DIAGONAL);
+                    }
+                }
+                case HORIZONTAL -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setType(BingoType.VERTICAL);
+                    } else {
+                        this.game.getOptions().setType(BingoType.ALL);
+                    }
+                }
+                case VERTICAL -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setType(BingoType.DIAGONAL);
+                    } else {
+                        this.game.getOptions().setType(BingoType.HORIZONTAL);
+                    }
+                }
+                case DIAGONAL -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setType(BingoType.ALL);
+                    } else {
+                        this.game.getOptions().setType(BingoType.VERTICAL);
+                    }
+                }
             }
             onSetItems();
         });
 
-        setItem(14, pvpItem(), player -> {
+        setItem(14, pvpItem(), (player, click) -> {
             this.game.getOptions().setPvp(!this.game.getOptions().isPvp());
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
             onSetItems();
         });
 
-        setItem(15, hardcoreItem(), player -> {
+        setItem(15, hardcoreItem(), (player, click) -> {
             this.game.getOptions().setHardcore(!this.game.getOptions().isHardcore());
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
@@ -80,33 +104,85 @@ public class BingoOptionsMenu extends SimpleMenu {
         });
 
         ItemStack uhcmodeItem = uhcmodeItem();
-        setItem(16, uhcmodeItem, player -> {
+        setItem(16, uhcmodeItem, (player, click) -> {
             this.game.getOptions().setUhcmode(!this.game.getOptions().isUhcmode());
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
             onSetItems();
         });
 
-        setItem(21, keepInventoryItem(), player -> {
+        setItem(20, randomTeams(), (player, click) -> {
+            this.game.getOptions().setRandomTeams(!this.game.getOptions().isRandomTeams());
+            player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
+
+            onSetItems();
+        });
+
+        setItem(21, teamSize(), (player, click) -> {
+            switch (this.game.getOptions().getTeamSize()) {
+                case 1 -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setTeamSize(2);
+                    } else {
+                        this.game.getOptions().setTeamSize(5);
+                    }
+                }
+                case 2 ->{
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setTeamSize(3);
+                    } else {
+                        this.game.getOptions().setTeamSize(1);
+                    }
+                }
+                case 3 -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setTeamSize(4);
+                    } else {
+                        this.game.getOptions().setTeamSize(2);
+                    }
+                }
+                case 4 -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setTeamSize(5);
+                    } else {
+                        this.game.getOptions().setTeamSize(3);
+                    }
+                }
+                default -> {
+                    if (click.isLeftClick()) {
+                        this.game.getOptions().setTeamSize(1);
+                    } else {
+                        this.game.getOptions().setTeamSize(4);
+                    }
+                }
+            }
+            player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
+
+            onSetItems();
+        }) ;
+
+        setItem(22, fullcardItem(), (player, click) -> {
+            this.game.getOptions().setFullCard(!this.game.getOptions().isFullCard());
+            player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
+
+            onSetItems();
+        });
+
+        setItem(23, keepInventoryItem(), (player, click) -> {
             this.game.getOptions().setKeepInventory(!this.game.getOptions().isKeepInventory());
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
             onSetItems();
         });
 
-        setItem(22, removeOnMarkItem(), player -> {
+        setItem(24, removeOnMarkItem(), (player, click) -> {
             this.game.getOptions().setRemoveMarkedItems(!this.game.getOptions().isRemoveMarkedItems());
             player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
             onSetItems();
         });
 
-        setItem(23, fullcardItem(), player -> {
-            this.game.getOptions().setFullCard(!this.game.getOptions().isFullCard());
-            player.playSound(player, Sound.UI_BUTTON_CLICK, SoundCategory.AMBIENT, 1.0f, 1.0f);
 
-            onSetItems();
-        });
     }
 
     private ItemStack removeOnMarkItem() {
@@ -330,6 +406,79 @@ public class BingoOptionsMenu extends SimpleMenu {
         lore.add(TextBuilder.minimessage("<gray>" + String.format("%02d", hours) + "h" + String.format("%02d", minutes) + "min"));
         lore.add(Component.text(""));
         lore.add(TextBuilder.minimessage(lang.ui("click_to_open")));
+        itemMeta.lore(lore);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    private ItemStack randomTeams() {
+        ItemStack itemStack = new ItemStack(Material.LIGHT_BLUE_BANNER);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("random_teams")));
+        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        List<Component> lore = new ArrayList<>();
+        if (this.game.getOptions().isRandomTeams()) {
+            lore.add(Component.text(""));
+            lore.add(TextBuilder.minimessage("<white><b>>> <green>ON"));
+            lore.add(TextBuilder.minimessage("<gray>OFF"));
+        } else {
+            lore.add(Component.text(""));
+            lore.add(TextBuilder.minimessage("<gray>ON"));
+            lore.add(TextBuilder.minimessage("<white><b>>> <red>OFF"));
+        }
+        itemMeta.lore(lore);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    private ItemStack teamSize() {
+        ItemStack itemStack = new ItemStack(Material.ENDER_EYE);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.displayName(TextBuilder.minimessage(lang.ui("team_size")));
+        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        List<Component> lore = new ArrayList<>();
+        switch (this.game.getOptions().getTeamSize()) {
+            case 1 -> {
+                lore.add(Component.text(""));
+                lore.add(TextBuilder.minimessage("<white><b>>> 1"));
+                lore.add(TextBuilder.minimessage("<gray>2"));
+                lore.add(TextBuilder.minimessage("<gray>3"));
+                lore.add(TextBuilder.minimessage("<gray>4"));
+                lore.add(TextBuilder.minimessage("<gray>5"));
+            }
+            case 2 -> {
+                lore.add(Component.text(""));
+                lore.add(TextBuilder.minimessage("<gray>1"));
+                lore.add(TextBuilder.minimessage("<white><b>>> 2"));
+                lore.add(TextBuilder.minimessage("<gray>3"));
+                lore.add(TextBuilder.minimessage("<gray>4"));
+                lore.add(TextBuilder.minimessage("<gray>5"));
+            }
+            case 3 -> {
+                lore.add(Component.text(""));
+                lore.add(TextBuilder.minimessage("<gray>1"));
+                lore.add(TextBuilder.minimessage("<gray>2"));
+                lore.add(TextBuilder.minimessage("<white><b>>> 3"));
+                lore.add(TextBuilder.minimessage("<gray>4"));
+                lore.add(TextBuilder.minimessage("<gray>5"));
+            }
+            case 4 -> {
+                lore.add(Component.text(""));
+                lore.add(TextBuilder.minimessage("<gray>1"));
+                lore.add(TextBuilder.minimessage("<gray>2"));
+                lore.add(TextBuilder.minimessage("<gray>3"));
+                lore.add(TextBuilder.minimessage("<white><b>>> 4"));
+                lore.add(TextBuilder.minimessage("<gray>5"));
+            }
+            case 5 -> {
+                lore.add(Component.text(""));
+                lore.add(TextBuilder.minimessage("<gray>1"));
+                lore.add(TextBuilder.minimessage("<gray>2"));
+                lore.add(TextBuilder.minimessage("<gray>3"));
+                lore.add(TextBuilder.minimessage("<gray>4"));
+                lore.add(TextBuilder.minimessage("<white><b>>> 5"));
+            }
+        }
         itemMeta.lore(lore);
         itemStack.setItemMeta(itemMeta);
         return itemStack;

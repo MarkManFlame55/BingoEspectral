@@ -7,14 +7,11 @@ import net.espectralgames.bingoEspectral.ui.BingoCardMenu;
 import net.espectralgames.bingoEspectral.utils.ErrorMessage;
 import net.espectralgames.bingoEspectral.utils.LangConfig;
 import net.espectralgames.bingoEspectral.utils.TextBuilder;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +32,7 @@ public class bingocardCommand implements TabExecutor {
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] strings) {
         final LangConfig lang = this.plugin.getLangConfig();
         if (commandSender instanceof Player player) {
-            BingoPlayer bingoPlayer = this.bingoGame.getPlayer(player);
+            final BingoPlayer bingoPlayer = this.bingoGame.getPlayer(player);
             if (bingoPlayer != null) {
                 if (bingoPlayer.getPersonalCard() != null) {
                     player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.AMBIENT, 1.0f, 2.0f);

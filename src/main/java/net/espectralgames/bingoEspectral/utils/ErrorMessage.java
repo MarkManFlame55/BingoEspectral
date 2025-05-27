@@ -10,11 +10,16 @@ public final class ErrorMessage {
     public static String MUST_BE_PLAYER = "must_be_player";
     public static String PLAYER_DOES_NOT_EXIST = "player_does_not_exist";
     public static String PLAYER_NOT_IN_GAME = "player_not_in_game";
+    public static String PLAYER_ALREADY_IN_GAME = "player_already_in_game";
     public static String TEAM_DOESNT_EXIST = "team_doesnt_exist";
     public static String NO_PENDING_INVITES = "no_pending_invites";
     public static String ALREDY_ON_THAT_TEAM = "alredy_on_that_team";
     public static String PLAYER_NOT_IN_A_TEAM = "player_not_in_a_team";
     public static String MALFORMED_COLOR_STRING = "malformed_color_string";
+    public static String ONLY_OWNER_ALLOWED = "only_owner_allowed";
+    public static String PREVENTED_SELF_ACTION = "prevented_self_action";
+    public static String GAME_HASNT_STARTED = "game_hasnt_started";
+    public static String GAME_ALREADY_STARTED = "game_already_started";
 
     private ErrorMessage() {}
 }

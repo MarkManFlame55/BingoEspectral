@@ -1,5 +1,5 @@
 name: BingoEspectral
-version: '1.2'
+version: '1.2.1'
 main: net.espectralgames.bingoEspectral.BingoEspectral
 api-version: '1.21'
 prefix: Bingo
@@ -10,9 +10,15 @@ permissions:
   bingo.host:
     description: Permissions to the /bingo commands
     default: op
+  bingo.player:
+    description: Permisos para todos.
 commands:
   bingo:
     description: Comando principal de bingo
     permission: bingo.host
   bingocard:
     description: Comando para ver la carta personal de Bingo!
+    permission: bingo.player
+  bingoteam:
+    description: Comando para administrar los Bingo Teams.
+    permission: bingo.player
